@@ -104,13 +104,13 @@ async function setupDatabaseSchema(client) {
         types TEXT[],
         breakfast BOOLEAN DEFAULT false,
         breakfast_hours VARCHAR(255),
-        breakfast_cost JSONB,  -- Using JSONB to store cost range as a JSON object
+        breakfast_cost JSONB,
         lunch BOOLEAN DEFAULT false,
         lunch_hours VARCHAR(255),
-        lunch_cost JSONB,      -- Using JSONB to store cost range as a JSON object
+        lunch_cost JSONB,
         dinner BOOLEAN DEFAULT false,
         dinner_hours VARCHAR(255),
-        dinner_cost JSONB,     -- Using JSONB to store cost range as a JSON object
+        dinner_cost JSONB,
         name VARCHAR(255),
         phone VARCHAR(20),
         hours JSONB,
@@ -118,8 +118,8 @@ async function setupDatabaseSchema(client) {
         email VARCHAR(255),
         web VARCHAR(255),
         social_platforms JSONB,
-        images TEXT[],                -- Array of image URLs
-        ad_banner VARCHAR(255),       -- URL to image file
+        images TEXT[],
+        ad_banner VARCHAR(255),
         description TEXT
     );
     `
