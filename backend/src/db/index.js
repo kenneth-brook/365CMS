@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 const { getDatabaseCredentials } = require('../config');
 
-let dbPool;
+let dbPool = null;
 
 async function getDbPool() {
     if (!dbPool) {
