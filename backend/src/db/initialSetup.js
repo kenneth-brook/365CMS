@@ -3,7 +3,7 @@ const { getDbPool } = require('./index');
 async function ensureDatabaseSchema() {
     const client = await getDbPool().connect();
     try {
-        const result = await client.query("SELECT to_regclass('public.users');");
+        const result = await client.query("SELECT to_regclass('public.client');");
         if (result.rows[0].to_regclass === null) {
             console.log("Database schema is not set up. Initializing...");
             await setupDatabaseSchema(client);
@@ -91,7 +91,7 @@ async function setupDatabaseSchema(client) {
         web VARCHAR(255),
         social_platforms JSONB,
         images TEXT[],  -- Array of image URLs
-        ad_banner VARCHAR(255),  -- URL to image file
+        ad_banner VARCHAR(255),
         description TEXT,
         chamber_member BOOLEAN DEFAULT false
     );
