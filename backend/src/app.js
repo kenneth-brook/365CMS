@@ -5,7 +5,7 @@ const stateManagementRoutes = require('./routes/stateManagementRoutes');
 
 const app = express();
 app.use(cors());
-app.use('/', stateManagementRoutes);
 app.use('/setup', setupRoutes);
+app.use('/', stateManagementRoutes);
 
 module.exports = app;
