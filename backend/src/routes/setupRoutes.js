@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ensureDatabaseSchema } = require('../db/initialSetup');
 
-router.get('/setup', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         await ensureDatabaseSchema();
         res.status(200).json({ message: 'Setup completed successfully' });
