@@ -3,7 +3,7 @@ const router = express.Router();
 const { ensureDatabaseSchema } = require('../db/initialSetup');
 console.log("Setup route handler for /setup is now active");
 
-router.get('/setup', async (req, res) => {
+router.get('/', async (req, res) => {
     console.log("Received request at /setup");
     try {
         await ensureDatabaseSchema();
