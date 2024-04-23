@@ -6,7 +6,7 @@ console.log("Setup route handler for /setup is now active");
 router.get('/', async (req, res) => {
     console.log("Received request at /setup");
     try {
-        await ensureDatabaseSchema();
+        //await ensureDatabaseSchema();
         res.status(200).json({ message: 'Setup completed successfully' });
     } catch (error) {
         console.error('Setup failed:', error);
