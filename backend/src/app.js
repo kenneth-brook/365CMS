@@ -10,6 +10,11 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use('/setup', setupRoutes);
-app.use('/', stateManagementRoutes);
+
+app.get('*', (req, res) => {
+    res.status(200).send(`You hit path: ${req.path}`);
+});
+
+//app.use('/', stateManagementRoutes);
 
 module.exports = app;

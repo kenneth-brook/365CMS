@@ -1,17 +1,26 @@
 const { getDbPool } = require('./index');
 
 async function ensureDatabaseSchema() {
-    const client = await getDbPool().connect();
+    let client;
     try {
+        client = await getDbPool().connect();  // Attempt to get a client from the pool
         const result = await client.query("SELECT to_regclass('public.client');");
+        
         if (result.rows[0].to_regclass === null) {
             console.log("Database schema is not set up. Initializing...");
-            await setupDatabaseSchema(client);
+            await setupDatabaseSchema(client);  // Set up database schema if not already set up
         } else {
             console.log("Database schema already set up.");
         }
+    } catch (error) {
+        console.error("Failed to ensure database schema:", error);
+        // Handle specific errors if there are any known error types you want to catch
+        // e.g., if (error.code === '23505') { // handle specific error }
+        throw error;  // Optionally re-throw the error if you want calling functions to handle it
     } finally {
-        client.release();
+        if (client) {
+            client.release();  // Always release the client if it was obtained
+        }
     }
 }
 
