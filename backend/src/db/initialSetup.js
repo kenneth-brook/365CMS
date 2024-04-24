@@ -400,6 +400,8 @@ async function setupDatabaseSchema(client) {
     `;
 
 
+    await client.query('BEGIN');
+    try {
     await client.query(queryText);
     console.log("Client table created.");
     await client.query(queryStaff);
@@ -410,32 +412,28 @@ async function setupDatabaseSchema(client) {
     console.log("Client settings table created.");
     await client.query(queryBusinesses);
     console.log("Businesses table created.");
+    await client.query(queryEatCost);
+    console.log("Eat Type table created.");
     await client.query(queryEat);
     console.log("Eat table created.");
     await client.query(queryEatType);
     console.log("Eat Type table created.");
     await client.query(queryEatToEatType);
     console.log("Eat Type table created.");
-    await client.query(queryEatCost);
-    console.log("Eat Type table created.");
-    await client.query(queryEatCostInput);
-    console.log("Eat Type table populated.");
     await client.query(queryPlay);
     console.log("Play table created.");
     await client.query(queryPlayType);
     console.log("Play Type table created.");
     await client.query(queryPlayToPlayType);
     console.log("Play to Play Type table created.");
+    await client.query(queryStayPrice);
+    console.log("Stay Price table created.");
     await client.query(queryStay);
     console.log("Stay table created.");
     await client.query(queryStayType);
     console.log("Stay Type table created.");
     await client.query(queryStayToStayType);
     console.log("Stay to Stay Type table created.");
-    await client.query(queryStayPrice);
-    console.log("Stay Price table created.");
-    await client.query(queryStayPriceInput);
-    console.log("Stay Price table populated.");
     await client.query(queryShop);
     console.log("Shop table created.");
     await client.query(queryShopType);
@@ -462,6 +460,19 @@ async function setupDatabaseSchema(client) {
     console.log("Business Categories table created.");
     await client.query(queryEvents);
     console.log("Events table created.");
+
+    await client.query(queryEatCostInput);
+    console.log("Eat Type table populated.");
+    await client.query(queryStayPriceInput);
+    console.log("Stay Price table populated.");
+
+    await client.query('COMMIT');  // Commit all changes
+    console.log("All tables created and populated successfully.");
+} catch (error) {
+    await client.query('ROLLBACK');  // Rollback on error
+    console.error("Failed to setup database schema:", error);
+    throw error;
+}
 }
 
 
