@@ -3,7 +3,8 @@ const { getDbPool } = require('./index');
 async function ensureDatabaseSchema() {
     let client;
     try {
-        client = await getDbPool().connect();  // Attempt to get a client from the pool
+        const pool = await getDbPool(); // Await the resolution of the pool
+        client = await pool.connect();  // Attempt to get a client from the pool
         const result = await client.query("SELECT to_regclass('public.client');");
         
         if (result.rows[0].to_regclass === null) {
@@ -14,8 +15,6 @@ async function ensureDatabaseSchema() {
         }
     } catch (error) {
         console.error("Failed to ensure database schema:", error);
-        // Handle specific errors if there are any known error types you want to catch
-        // e.g., if (error.code === '23505') { // handle specific error }
         throw error;  // Optionally re-throw the error if you want calling functions to handle it
     } finally {
         if (client) {

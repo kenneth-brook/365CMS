@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const { getDatabaseCredentials } = require('../config');
+const { getDatabaseCredentials } = require('../config/index');
 
 let dbPool = null;
 
