@@ -4,24 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Port Display</title>
-    <style>
-        /* Center the content */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .portInfo {
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css?v4">
 </head>
 <body>
-    
-    <div class="portInfo"><h1 id="portInfo">Loading...</h1></div>
-
-    <script src="app.js"></script>
+    <div class="background-container"></div> <!-- Background with animated effect -->
+    <div class="circle">
+        <img class="logImage" src="img/logimg.png" />
+        <div class="content"></div>
+    </div>
+    <div class="circle-glow"></div>
+    <!--<script src="app.js"></script>-->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <filter id="water-effect">
+            <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.01" numOctaves="5" result="turbulence"/>
+            <feDisplacementMap id="displacement" in2="turbulence" in="SourceGraphic" scale="20" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
 </body>
+<script>
+    function animateFilter() {
+        const feDisplacementMap = document.querySelector('feDisplacementMap');
+        const displacement = document.getElementById('displacement');
+        let scale = 20; // Start scale
+        let numOctives = 1
+        let increment = 1;
+        let increment2 = 1;
+
+        setInterval(() => {
+            scale += increment;
+            numOctives += increment2;
+            if (scale > 50 || scale < 20) {
+                increment *= -1; // Reverse the increment direction when hitting bounds
+            }
+            if (numOctives > 6 || numOctives < 2) {
+                increment2 *= -1; // Reverse the increment direction when hitting bounds
+            }
+            feDisplacementMap.setAttribute('scale', scale);
+            displacement.setAttribute('numOctives', numOctives)
+        }, 50);
+    }
+
+    window.onload = animateFilter;
+</script>
 </html>
