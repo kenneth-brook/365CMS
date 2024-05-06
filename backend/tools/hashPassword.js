@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const passwordToHash = 'Seabreeze#1';
+const passwordToHash = 'passToHashGoesHere';
 
 bcrypt.hash(passwordToHash, 10, (err, hash) => {
     if (err) {

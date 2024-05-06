@@ -2,17 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    //allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(express.json());
 
 app.use('/setup', setupRoutes);
 
 app.use('/', stateManagementRoutes);
+
+app.use('/auth', authRoutes);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);
