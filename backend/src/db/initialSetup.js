@@ -1,6 +1,5 @@
 const { getDbPool } = require('./index');
-const fs = require('fs').promises;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 async function ensureDatabaseSchema() {
     let client;
