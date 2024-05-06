@@ -1,4 +1,6 @@
 const { getDbPool } = require('./index');
+const fs = require('fs').promises;
+const bcrypt = require('bcrypt');
 
 async function ensureDatabaseSchema() {
     let client;
@@ -13,6 +15,9 @@ async function ensureDatabaseSchema() {
         } else {
             console.log("Database schema already set up.");
         }
+
+        await checkAndCreateAdmin(client);
+
     } catch (error) {
         console.error("Failed to ensure database schema:", error);
         throw error;  // Optionally re-throw the error if you want calling functions to handle it
@@ -64,7 +69,8 @@ async function setupDatabaseSchema(client) {
     const queryLogin = `
     CREATE TABLE login (
         id SERIAL PRIMARY KEY,
-        staff_id INTEGER NOT NULL,
+        staff_id INTEGER,
+        email VARCHAR(255),
         password VARCHAR(255) NOT NULL,
         role VARCHAR(100),
         FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
