@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;  /* Prevent body scrolling */
+}
+
+main {
+    width: 85%;  /* Remaining width of the page */
+    margin-left: 15%;  /* Offset by the width of the menu */
+    height: 100vh;  /* Full viewport height */
+    overflow-y: auto;  /* Allow scrolling within the main content area */
+    padding: 20px;
+    position: relative;  /* Ensure it is laid out with respect to the body */
+    background: #fff;  /* Optional: sets a background for the main content */
+}

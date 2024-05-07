@@ -1,0 +1,56 @@
+.tabs {
+    padding: 10px;
+    position: relative; /* Needed for pseudo-elements */
+}
+
+.tab-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Align tabs in a row */
+    white-space: nowrap; /* Prevents wrapping of tabs */
+}
+
+.tab-links li {
+    margin-right: -5px; /* Negative margin for overlap */
+    /*overflow: hidden;  Prevents border from spilling out */
+}
+
+.tab-links a {
+    padding: 10px 15px;
+    display: block;
+    background:#54B74A;
+    ;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    position: relative;
+    
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.4); /* Adds depth */
+    clip-path: polygon(0 0, 90% 0%, 100% 100%, 0% 100%);
+    border-top-left-radius: 15px;
+}
+
+.tab-links a:hover,
+.tab-links a.active {
+    background: #006AAC;
+    color: white;
+    z-index: 12;
+}
+
+.tab-content {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background:#B6DAEA;
+    ;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
