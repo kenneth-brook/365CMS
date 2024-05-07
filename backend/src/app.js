@@ -12,11 +12,9 @@ app.use(cors({
 
 app.use(express.json());
 
+app.use('/login', authRoutes);
 app.use('/setup', setupRoutes);
-
 app.use('/', stateManagementRoutes);
-
-app.use('/auth', authRoutes);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);

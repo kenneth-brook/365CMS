@@ -6,7 +6,8 @@ const { getDbPool } = require('../db'); // Adjust path as necessary
 const router = express.Router();
 
 // POST endpoint for login
-router.post('/login', async (req, res) => {
+router.post('/', async (req, res) => {
+    console.log('Attempting to log in with body:', req.body);
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).send('Email and password must be provided');
