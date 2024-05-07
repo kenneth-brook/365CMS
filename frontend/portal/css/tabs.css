@@ -1,5 +1,5 @@
 .tabs {
-    padding: 10px;
+    padding: 8px 15px;
     position: relative; /* Needed for pseudo-elements */
 }
 
@@ -17,25 +17,24 @@
 }
 
 .tab-links a {
-    padding: 10px 15px;
+    padding: 8px 35px;
     display: block;
     background:#54B74A;
-    ;
     color: white;
     text-decoration: none;
     transition: background-color 0.3s;
     position: relative;
-    
     box-shadow: 4px 4px 8px rgba(0,0,0,0.4); /* Adds depth */
     clip-path: polygon(0 0, 90% 0%, 100% 100%, 0% 100%);
     border-top-left-radius: 15px;
+    font-size: 2rem;
 }
 
 .tab-links a:hover,
 .tab-links a.active {
     background: #006AAC;
     color: white;
-    z-index: 12;
+    z-index: 12 !important;
 }
 
 .tab-content {
