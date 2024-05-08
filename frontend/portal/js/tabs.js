@@ -24,19 +24,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabLinksContainer = document.querySelector('.tab-links');
     const tabContentContainer = document.querySelector('.tab-content');
 
-    // Generate tabs dynamically
     tabs.forEach(tab => {
         const tabLink = document.createElement('li');
         const link = document.createElement('a');
         link.href = `#${tab.id}`;
         link.textContent = tab.title;
-        link.addEventListener('click', function (e) {
+        link.addEventListener('click', (e) => {
             e.preventDefault();
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-links a').forEach(a => a.classList.remove('active'));
 
-            document.querySelector(this.getAttribute('href')).classList.add('active');
-            this.classList.add('active');
+            document.querySelector(link.getAttribute('href')).classList.add('active');
+            link.classList.add('active');
         });
 
         tabLink.appendChild(link);
@@ -45,21 +44,32 @@ document.addEventListener('DOMContentLoaded', function () {
         const tabContent = document.createElement('div');
         tabContent.id = tab.id;
         tabContent.className = 'tab';
-        tabContent.textContent = `Content for ${tab.title} will go here.`;
+
+        // Add specific toolbar based on the tab
+        if (tab.id === 'businesses') {
+            tabContent.appendChild(createBusinessToolbar());
+        } else if (tab.id === 'events') {
+            tabContent.appendChild(createEventsToolbar());
+        } else if (tab.id === 'office-content') {
+            tabContent.appendChild(createOfficeContentToolbar());
+        }
+
+        const contentArea = document.createElement('div');
+        contentArea.className = 'content-area';
+        contentArea.textContent = `Content for ${tab.title} will go here.`;
+        tabContent.appendChild(contentArea);
+
         tabContentContainer.appendChild(tabContent);
     });
 
-    // Activate the first tab by default if it exists
     if (tabs.length > 0) {
         tabLinksContainer.children[0].children[0].classList.add('active');
         tabContentContainer.children[0].classList.add('active');
     }
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tab-links a');
-    let zIndex = 10; // Start from z-index 10
-    tabs.forEach(tab => {
+    const tabsLinks = document.querySelectorAll('.tab-links a');
+    let zIndex = 10;
+    tabsLinks.forEach(tab => {
         tab.style.zIndex = zIndex--;
     });
 });
