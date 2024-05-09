@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Simulate user roles received after login
+    setupTabs();
+    window.addEventListener('popstate', handleLocation);
+    handleLocation();  // Call on initial load to handle the current location
+});
+
+function setupTabs() {
     //const userRole = localStorage.getItem('userRole'); // Assume 'admin', 'user', etc.
     const userRole = '365admin'
-
-    // Define available tabs per role
     const rolesToTabs = {
         "365admin": [
             { id: 'businesses', title: 'Businesses' },
@@ -72,4 +75,28 @@ document.addEventListener('DOMContentLoaded', function () {
     tabsLinks.forEach(tab => {
         tab.style.zIndex = zIndex--;
     });
+};
+
+function handleLocation() {
+    const path = window.location.hash.replace('#', '') || 'businesses'; // Default to 'businesses' if hash is empty
+    navigateToTab(path);
+}
+
+function navigateToTab(tabId) {
+    window.history.pushState({}, '', `#${tabId}`);
+    activateTab(tabId);
+}
+
+function activateTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-links a').forEach(a => a.classList.remove('active'));
+    document.querySelector('#' + tabId).classList.add('active');
+    document.querySelector(`a[href='#${tabId}']`).classList.add('active');
+}
+
+window.addEventListener('popstate', () => {
+    const tabId = window.location.hash.replace('#', '');
+    if (tabId) {
+        activateTab(tabId);
+    }
 });
