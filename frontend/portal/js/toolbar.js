@@ -12,13 +12,13 @@ const createBusinessToolbar = () => {
     `;
 
     toolbar.querySelector('.add-new').addEventListener('click', () => {
-        const contentArea = document.querySelector('.content-area');
-        contentArea.innerHTML = getBusinessForm(); // Replace content with form
+        //const contentArea = document.querySelector('.content-area');
+        addBusinessForm(); // Replace content with form
 
         // Attach form submit handler here if needed
-        document.getElementById('business-form').addEventListener('submit', handleBusinessFormSubmit);
+        //document.getElementById('business-form').addEventListener('submit', handleBusinessFormSubmit);
     });
-    
+
     return toolbar;
 };
 
