@@ -1,27 +1,30 @@
 class TabManager {
-    constructor(store) {
+    constructor(store, apiService) {
         this.store = store;
+        this.apiService = apiService; // Add ApiService to the TabManager
         this.tabContainer = document.querySelector('.tab-links');
         this.contentArea = document.querySelector('.tab-content');
 
-        // Fetch user role from the server
+        // Fetch user role from the server using ApiService
         this.fetchUserRole().then(role => {
             this.userRole = role;
             this.setupTabs();
+        }).catch(error => {
+            console.error('Initialization error:', error);
+            // Handle initialization errors, potentially redirect or show a message
         });
     }
 
     async fetchUserRole() {
         try {
-            const response = await fetch('/user-role', { credentials: 'include' });
-            if (!response.ok) {
-                throw new Error('Authentication required');
+            const data = await this.apiService.fetch('user-role', { credentials: 'include' });
+            if (!data.role) {
+                throw new Error('Role data is missing');
             }
-            const data = await response.json();
             return data.role;
         } catch (error) {
             console.error('Error fetching user role:', error);
-            window.location.href = '../'; // Redirect to login if not authenticated
+            window.location.href = '../'; // Redirect to login if not authenticated or other errors
             return null; // Return null or handle appropriately
         }
     }
@@ -55,5 +58,11 @@ class TabManager {
         this.contentArea.innerHTML = this.tabs[tab];
     }
 }
+
+// Assuming ApiService is initialized and available
+const apiService = new ApiService(); // Initialize ApiService with token if required
+const store = {}; // Assuming some kind of state management
+const tabManager = new TabManager(store, apiService); // Pass ApiService instance to TabManager
+
 
 export default TabManager;

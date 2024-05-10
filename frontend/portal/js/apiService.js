@@ -5,15 +5,18 @@ class ApiService {
     }
 
     async fetch(url, options = {}) {
-        options.headers = {
-            ...options.headers,
-            Authorization: `Bearer ${this.token}`,
-        };
+        // Conditionally add the Authorization header only if a token is present
+        const headers = { ...options.headers };
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+
+        options.headers = headers;
 
         try {
             const response = await fetch(this.baseURL + url, options);
             if (!response.ok) {
-            throw new Error('Network response was not ok.');
+                throw new Error('Network response was not ok.');
             }
             return await response.json();
         } catch (error) {
