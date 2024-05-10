@@ -12,16 +12,16 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            credentials: 'include'
         })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to login');
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
-            localStorage.setItem('authToken', data.token); // Store the token in local storage
             window.location.href = './portal/index.html'; // Redirect to the SPA
         })
         .catch(error => {

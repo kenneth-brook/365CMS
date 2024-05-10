@@ -29,11 +29,18 @@ router.post('/', async (req, res) => {
             }
 
             // Generate a token (optional)
-            const token = jwt.sign({ id: user.id, email: user.email }, 'your_jwt_secret', {
+            const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, 'your_jwt_secret', {
                 expiresIn: 86400 // 24 hours
             });
 
-            res.json({ message: 'Login successful', token });
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                sameSite: 'strict', // Strict SameSite policy for CSRF protection
+                maxAge: 86400000 // 24 hours in milliseconds
+            });
+
+            res.status(200).send('Login successful');
         } finally {
             client.release();
         }
