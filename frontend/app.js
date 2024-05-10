@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to login');
+                return response.text().then(text => {
+                    throw new Error(`Failed to login: ${response.status} - ${text}`);
+                });
             }
             return response.text();
         })
@@ -26,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => {
             console.error('Error:', error);
-            document.querySelector('.error-message').innerHTML = 'Login Failed: ' + error.message;
+            console.error('Detailed message:', error.message);
+            //document.querySelector('.error-message').innerHTML = 'Login Failed: ' + error.message;
         });
     });
 });

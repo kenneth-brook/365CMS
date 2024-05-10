@@ -6,18 +6,22 @@ const authRoutes = require('./routes/authRoutes');
 const role = require('./routes/role');
 
 const app = express();
-app.use(cors({
-    origin: '*',
+const corsOptions = {
+    origin: 'https://dev.365easyflow.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
 app.use('/login', authRoutes);
 app.use('/setup', setupRoutes);
-app.get('/user-role', role);
+app.use('/user-role', role);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
