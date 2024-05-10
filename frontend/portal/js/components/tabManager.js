@@ -5,8 +5,12 @@ class TabManager {
         this.tabContainer = document.querySelector('.tab-links');
         this.contentArea = document.querySelector('.tab-content');
 
+        console.log('TabManager initialized', this.tabContainer, this.contentArea);
+        
+
         // Fetch user role from the server using ApiService
         this.fetchUserRole().then(role => {
+            console.log('User role fetched:', role);
             this.userRole = role;
             this.setupTabs();
         }).catch(error => {
@@ -17,7 +21,7 @@ class TabManager {
 
     async fetchUserRole() {
         try {
-            const data = await this.apiService.fetch('user-role', { credentials: 'include' });
+            const data = await this.apiService.fetch('user-role');
             if (!data.role) {
                 throw new Error('Role data is missing');
             }
@@ -40,6 +44,7 @@ class TabManager {
             this.tabs['Office Content'] = 'Office related information and tools.';
         }
 
+        console.log('Setting up tabs:', this.tabs);
         this.initTabs();
     }
 
@@ -56,13 +61,8 @@ class TabManager {
 
     loadTabContent(tab) {
         this.contentArea.innerHTML = this.tabs[tab];
+        console.log('Tab content loaded:', tab);
     }
 }
-
-// Assuming ApiService is initialized and available
-const apiService = new ApiService(); // Initialize ApiService with token if required
-const store = {}; // Assuming some kind of state management
-const tabManager = new TabManager(store, apiService); // Pass ApiService instance to TabManager
-
 
 export default TabManager;
