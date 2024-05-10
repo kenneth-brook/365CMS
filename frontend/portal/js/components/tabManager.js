@@ -3,8 +3,30 @@ class TabManager {
         this.store = store;
         this.tabContainer = document.querySelector('.tab-links');
         this.contentArea = document.querySelector('.tab-content');
-        this.userRole = this.getUserRole();  // Assuming you have a method to fetch the user's role
 
+        // Fetch user role from the server
+        this.fetchUserRole().then(role => {
+            this.userRole = role;
+            this.setupTabs();
+        });
+    }
+
+    async fetchUserRole() {
+        try {
+            const response = await fetch('/user-role', { credentials: 'include' });
+            if (!response.ok) {
+                throw new Error('Authentication required');
+            }
+            const data = await response.json();
+            return data.role;
+        } catch (error) {
+            console.error('Error fetching user role:', error);
+            window.location.href = '../'; // Redirect to login if not authenticated
+            return null; // Return null or handle appropriately
+        }
+    }
+
+    setupTabs() {
         this.tabs = {
             'Businesses': 'Content related to businesses will be displayed here.',
             'Events': 'Here you can view and manage upcoming events.',
@@ -32,12 +54,6 @@ class TabManager {
     loadTabContent(tab) {
         this.contentArea.innerHTML = this.tabs[tab];
     }
-
-    getUserRole() {
-        const token = localStorage.getItem('jwt');
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role;
-    }
 }
 
-export default TabManager
+export default TabManager;

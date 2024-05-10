@@ -3,17 +3,21 @@ const cors = require('cors');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
+const role = require('./routes/role');
 
 const app = express();
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
 app.use('/login', authRoutes);
 app.use('/setup', setupRoutes);
+app.get('/user-role', role);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {

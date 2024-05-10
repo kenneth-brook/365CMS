@@ -35,4 +35,7 @@
     <script type="module" src="js/components/tabManager.js"></script>
     <script type="module" src="js/main.js"></script>
 </body>
+<script>
+    window.userRole = '{{userRole}}'; // Injected server-side, safe from client tampering as it doesn't expose the JWT
+</script>
 </html>
