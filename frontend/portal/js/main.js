@@ -1,13 +1,13 @@
 import ApiService from './apiService.js';
-import TabManager from './components/tabManager.js';
 import Router from './router.js';
 import Store from './store.js';
+import TabManager from './components/tabManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const store = new Store({});
     const apiService = new ApiService();
     const router = new Router();
-    const tabManager = new TabManager(store, apiService);
+    const tabManager = new TabManager(store, apiService, router);
 
     apiService.fetch('user-role').then(data => {
         if (!data.role) {

@@ -1,10 +1,11 @@
 class TabManager {
-    constructor(store, apiService) {
+    constructor(store, apiService, router) {
         this.store = store;
         this.apiService = apiService;
+        this.router = router;
         this.tabContainer = document.querySelector('.tab-links');
         this.contentArea = document.querySelector('.tab-content');
-        console.log('TabManager initialized');
+        this.setupTabs();
     }
 
     setupTabs() {
@@ -40,7 +41,7 @@ class TabManager {
             link.textContent = tab.title;
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.loadTabContent(tab.id);
+                this.router.navigate(tab.id);
             });
 
             tabLink.appendChild(link);
@@ -51,7 +52,14 @@ class TabManager {
             tabContent.className = 'tab';
             tabContent.innerHTML = `<div class="content-area">Content for ${tab.title} will go here.</div>`;
             this.contentArea.appendChild(tabContent);
+            this.router.addRoute(tab.id, () => this.loadTabContent(tab.id));
         });
+
+        if (window.location.hash) {
+            this.router.loadCurrentRoute();
+        } else if (this.tabs.length > 0) {
+            this.router.navigate(this.tabs[0].id);
+        }
     }
 
     loadTabContent(tabId) {
