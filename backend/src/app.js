@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
@@ -6,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const role = require('./routes/role');
 
 const app = express();
+app.use(cookieParser());
 const corsOptions = {
     origin: 'https://dev.365easyflow.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
