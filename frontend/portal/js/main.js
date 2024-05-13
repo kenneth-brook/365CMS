@@ -15,11 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         tabManager.userRole = data.role;
         tabManager.setupTabs();
-        setTimeout(() => tabManager.loadTabContent('businesses'), 0);  // Ensure DOM is updated
+
+        // Define routes for each tab
+        tabManager.tabs.forEach(tab => {
+            router.addRoute(tab.id, () => tabManager.loadTabContent(tab.id));
+        });
+
+        // Navigate to the initial route based on the current URL or set default
+        router.loadCurrentRoute();
     }).catch(error => {
         console.error("Failed to initialize tabs based on user role:", error);
     });
 });
-
-
 

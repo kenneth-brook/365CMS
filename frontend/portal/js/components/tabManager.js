@@ -1,3 +1,5 @@
+import { createBusinessToolbar, createEventsToolbar, createOfficeContentToolbar } from './toolbars.js';
+
 class TabManager {
     constructor(store, apiService, router) {
         this.store = store;
@@ -12,17 +14,18 @@ class TabManager {
         console.log('Setting up tabs');
         const rolesToTabs = {
             "365admin": [
-                { id: 'businesses', title: 'Businesses' },
-                { id: 'events', title: 'Events' },
-                { id: 'office-content', title: 'Office Content' }
+                { id: 'businesses', title: 'Businesses', toolbar: createBusinessToolbar },
+                { id: 'events', title: 'Events', toolbar: createEventsToolbar },
+                { id: 'office-content', title: 'Office Content', toolbar: createOfficeContentToolbar }
             ],
             admin: [
-                { id: 'businesses', title: 'Businesses' },
-                { id: 'events', title: 'Events' },
-                { id: 'office-content', title: 'Office Content' }
+                { id: 'businesses', title: 'Businesses', toolbar: createBusinessToolbar },
+                { id: 'events', title: 'Events', toolbar: createEventsToolbar },
+                { id: 'office-content', title: 'Office Content', toolbar: createOfficeContentToolbar }
             ],
             user: [
-                { id: 'events', title: 'Events' }
+                { id: 'businesses', title: 'Businesses', toolbar: createBusinessToolbar },
+                { id: 'events', title: 'Events', toolbar: createEventsToolbar }
             ]
         };
 
@@ -43,24 +46,35 @@ class TabManager {
                 e.preventDefault();
                 this.router.navigate(tab.id);
             });
-
+    
             tabLink.appendChild(link);
             this.tabContainer.appendChild(tabLink);
-
+    
             const tabContent = document.createElement('div');
             tabContent.id = tab.id;
             tabContent.className = 'tab';
-            tabContent.innerHTML = `<div class="content-area">Content for ${tab.title} will go here.</div>`;
+    
+            // Append the toolbar first
+            const toolbar = tab.toolbar();
+            tabContent.appendChild(toolbar);
+    
+            // Then create and append the content area
+            const contentArea = document.createElement('div');
+            contentArea.className = 'content-area';
+            contentArea.innerHTML = `Content for ${tab.title} will go here.`;
+            tabContent.appendChild(contentArea);
+    
             this.contentArea.appendChild(tabContent);
             this.router.addRoute(tab.id, () => this.loadTabContent(tab.id));
         });
-
+    
         if (window.location.hash) {
             this.router.loadCurrentRoute();
         } else if (this.tabs.length > 0) {
             this.router.navigate(this.tabs[0].id);
         }
     }
+    
 
     loadTabContent(tabId) {
         console.log('Loading tab content for:', tabId);

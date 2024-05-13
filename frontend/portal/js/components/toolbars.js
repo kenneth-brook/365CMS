@@ -1,4 +1,4 @@
-const createBusinessToolbar = () => {
+export const createBusinessToolbar = () => {
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
@@ -12,32 +12,31 @@ const createBusinessToolbar = () => {
     `;
 
     toolbar.querySelector('.add-new').addEventListener('click', () => {
-        //const contentArea = document.querySelector('.content-area');
-        addBusinessForm(); // Replace content with form
-
-        // Attach form submit handler here if needed
-        //document.getElementById('business-form').addEventListener('submit', handleBusinessFormSubmit);
+        const contentArea = document.querySelector('.content-area');
+        contentArea.innerHTML = getBusinessForm(); // Replaces all content with the business form
     });
-
+    
     return toolbar;
 };
 
-const createEventsToolbar = () => {
+export const createEventsToolbar = () => {
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
         <input type="text" placeholder="Search events..." class="search-box">
         <button class="add-new">Add New Event</button>
     `;
+    console.log("Creating events toolbar");
     return toolbar;
 };
 
-const createOfficeContentToolbar = () => {
+export const createOfficeContentToolbar = () => {
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
         <input type="text" placeholder="Search office content..." class="search-box">
         <button class="add-new">Add New Content</button>
     `;
+    console.log("Creating office toolbar");
     return toolbar;
 };
