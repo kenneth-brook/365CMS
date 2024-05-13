@@ -5,15 +5,21 @@ import Store from './store.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const store = new Store({});
-    const apiService = new ApiService(); // Initialize ApiService without JWT
+    const apiService = new ApiService();
     const router = new Router();
-
     const tabManager = new TabManager(store, apiService);
-    tabManager.fetchUserRole().then(role => {
-        tabManager.setupTabs();  // Setup tabs based on user role
-        tabManager.loadTabContent('Businesses');  // Set 'Businesses' as the default tab
+
+    apiService.fetch('user-role').then(data => {
+        if (!data.role) {
+            throw new Error('Role data is missing');
+        }
+        tabManager.userRole = data.role;
+        tabManager.setupTabs();
+        setTimeout(() => tabManager.loadTabContent('businesses'), 0);  // Ensure DOM is updated
     }).catch(error => {
         console.error("Failed to initialize tabs based on user role:", error);
-        // Handle initialization error (e.g., redirect to login or show error message)
     });
 });
+
+
+
