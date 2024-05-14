@@ -1,14 +1,14 @@
-import { router } from '../../../services/router';
-import { apiService } from '../../../services/apiService';
-
+// src/components/tabs/businesses/ListBusinesses.js
 class ListBusinesses {
-  constructor() {
-    this.container = document.createElement('div');
-  }
+    constructor() {
+        this.container = document.createElement('div');
+    }
 
-  render() {
-    this.container.innerHTML = `<div>All businesses listed here.</div>`;
-    // Add more complex rendering and event listeners here
-    return this.container;
-  }
+    render() {
+        this.container.innerHTML = `<div>All businesses listed here with options to edit or delete each entry.</div>`;
+        // Add more complex rendering and event listeners here
+        return this.container;
+    }
 }
+
+export default ListBusinesses;

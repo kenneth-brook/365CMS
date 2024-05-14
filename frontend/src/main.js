@@ -1,30 +1,36 @@
-import ApiService from './services/apiService.js';
 import Router from './services/router.js';
 import Store from './services/store.js';
-import TabManager from './components/tabManager.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const store = new Store({});
-    const apiService = new ApiService();
     const router = new Router();
-    const tabManager = new TabManager(store, apiService, router);
+    
+    try {
+        const ApiService = await import('./services/apiService.js');
+        const apiService = new ApiService();
+        const userData = await apiService.fetch('user-role');
 
-    apiService.fetch('user-role').then(data => {
-        if (!data.role) {
+        if (!userData.role) {
             throw new Error('Role data is missing');
         }
-        tabManager.userRole = data.role;
-        tabManager.setupTabs();
 
-        // Define routes for each tab
+        // Store the user role in a centralized state management
+        store.setUserRole(userData.role);
+
+        const TabManager = await import('./components/tabManager.js');
+        const tabManager = new TabManager(store, apiService, router);
+        tabManager.setupTabs(); // tabManager no longer needs to know about userRole directly
+
         tabManager.tabs.forEach(tab => {
             router.addRoute(tab.id, () => tabManager.loadTabContent(tab.id));
         });
 
-        // Navigate to the initial route based on the current URL or set default
         router.loadCurrentRoute();
-    }).catch(error => {
+    } catch (error) {
         console.error("Failed to initialize tabs based on user role:", error);
-    });
+        document.getElementById('content').innerHTML = '<p>Error loading the application. Please try again later.</p>';
+    }
 });
+
+
 

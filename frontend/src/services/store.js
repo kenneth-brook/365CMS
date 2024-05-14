@@ -1,7 +1,6 @@
-// store.js
 class Store {
     constructor(initialState) {
-        this.state = initialState;
+        this.state = initialState || {};
         this.listeners = [];
     }
 
@@ -14,9 +13,19 @@ class Store {
         this.listeners.forEach(listener => listener(this.state));
     }
 
+    setUserRole(role) {
+        this.updateState({ userRole: role });
+    }
+
+    getUserRole() {
+        return this.state.userRole;
+    }
+
     subscribe(listener) {
         this.listeners.push(listener);
-        return () => this.listeners = this.listeners.filter(l => l !== listener); // Return an unsubscribe function
+        return () => {
+            this.listeners = this.listeners.filter(l => l !== listener); // Return an unsubscribe function
+        };
     }
 }
 
