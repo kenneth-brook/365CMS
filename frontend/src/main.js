@@ -1,6 +1,6 @@
-import ApiService from './apiService.js';
-import Router from './router.js';
-import Store from './store.js';
+import ApiService from './services/apiService.js';
+import Router from './services/router.js';
+import Store from './services/store.js';
 import TabManager from './components/tabManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {

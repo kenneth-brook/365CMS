@@ -1,4 +1,4 @@
-import { createBusinessToolbar, createEventsToolbar, createOfficeContentToolbar } from './toolbars.js';
+import { createBusinessToolbar, createEventsToolbar, createOfficeContentToolbar } from './common/toolbars.js';
 
 class TabManager {
     constructor(store, apiService, router) {
