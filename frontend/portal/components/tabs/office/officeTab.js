@@ -1,6 +1,6 @@
 // Assuming AddOfficeContent.js, EditOfficeContent.js, and ListOfficeContent.js are defined in the same directory
-import AddOffice from './AddOffice.js';
-import EditOffice from './EditOffice.js';
+//import AddOffice from './AddOffice.js';
+//import EditOffice from './EditOffice.js';
 import ListOffice from './listOffice.js';
 
 class OfficeTab {

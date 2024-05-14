@@ -1,6 +1,6 @@
 // Assuming AddEvent.js, EditEvent.js, and ListEvents.js are defined in the same directory
-import AddEvent from './AddEvent.js';
-import EditEvent from './EditEvent.js';
+//import AddEvent from './AddEvent.js';
+//import EditEvent from './EditEvent.js';
 import ListEvents from './listEvents.js';
 
 class EventsTab {
