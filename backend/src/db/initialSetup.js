@@ -98,13 +98,10 @@ async function setupDatabaseSchema(client) {
         lat NUMERIC(9,6),
         long NUMERIC(9,6),
         phone VARCHAR(20),
-        hours JSONB,
-        special_days JSONB,
         email VARCHAR(255),
         web VARCHAR(255),
         social_platforms JSONB,
         images TEXT[],  -- Array of image URLs
-        ad_banner VARCHAR(255),
         description TEXT,
         chamber_member BOOLEAN DEFAULT false
     );

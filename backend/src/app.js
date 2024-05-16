@@ -5,6 +5,7 @@ const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
 const role = require('./routes/role');
+const formSubmissionRoutes = require('./routes/formSubmissionRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -20,10 +21,12 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/login', authRoutes);
 app.use('/setup', setupRoutes);
 app.use('/user-role', role);
+app.use('/form-submission', formSubmissionRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
