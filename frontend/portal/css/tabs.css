@@ -19,7 +19,7 @@
 .tab-links a {
     padding: 8px 35px;
     display: block;
-    background:#54B74A;
+    background: #54B74A;
     color: white;
     text-decoration: none;
     transition: background-color 0.3s;
@@ -43,7 +43,7 @@
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     border-top-right-radius: 15px;
-    background:#B6DAEA;
+    background: #B6DAEA;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -92,7 +92,8 @@
     margin-bottom: 5px;
 }
 
-input[type="text"], input[type="checkbox"], select {
+input[type="text"], input[type="checkbox"], select,
+input[type="tel"], input[type="email"], input[type="url"] {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;  /* Space between form elements */
@@ -104,7 +105,8 @@ input[type="text"], input[type="checkbox"], select {
     box-sizing: border-box;  /* Includes padding and border in the element's total width and height */
 }
 
-input[type="text"]:focus, select:focus {
+input[type="text"]:focus, select:focus,
+input[type="tel"]:focus, input[type="email"]:focus, input[type="url"]:focus {
     outline: none;  /* Removes the default focus outline */
     border-color: #009688;  /* Highlight color when focused */
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);  /* Deeper shadow for a more pronounced effect */
@@ -149,7 +151,7 @@ input[type="submit"]:hover {
 }
 
 #business-form button {
-    background-color:#55B84B;
+    background-color: #55B84B;
     color: white;
     font-size: 1.8rem;
     padding: 5px 10px;
@@ -159,11 +161,85 @@ input[type="submit"]:hover {
     text-shadow: 3px 5px 8px rgba(0, 0, 0, 0.3);
 }
 
-#autofill-button {
+#autofill-button, #add-social-media {
     align-self: flex-start;
 }
 
 #business-form button:hover {
     box-shadow: inset -3px -5px 8px rgba(0, 0, 0, 0.3);
     text-shadow: -3px -5px 8px rgba(0, 0, 0, 0.3);
+}
+
+#social-media-section .form-group {
+    width: 45%;
+  }
+  
+  #social-media-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  #social-media-list li {
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  #image-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  #image-thumbnails img.thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  #image-file-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+  
+  #image-file-list li {
+    background-color: #f4f4f4;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .description-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.description-container {
+    width: 50%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.description-container:focus-within {
+    border-color: #009688;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.tox-promotion {
+    display: none;
 }
