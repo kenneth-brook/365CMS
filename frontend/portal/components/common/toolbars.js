@@ -1,4 +1,8 @@
-export const createBusinessToolbar = () => {
+import { getBusinessForm } from '../tabs/businesesses/getBusinessForm.js';
+
+export const createBusinessToolbar = (router) => {
+    console.log('createBusinessToolbar called with router:', router);
+
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
@@ -12,8 +16,8 @@ export const createBusinessToolbar = () => {
     `;
 
     toolbar.querySelector('.add-new').addEventListener('click', () => {
-        const contentArea = document.querySelector('.content-area');
-        contentArea.innerHTML = getBusinessForm(); // Replaces all content with the business form
+        console.log('Navigating to businesses/add');
+        router.navigate('businesses/add');
     });
     
     return toolbar;

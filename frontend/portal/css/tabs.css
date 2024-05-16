@@ -153,4 +153,17 @@ input[type="submit"]:hover {
     color: white;
     font-size: 1.8rem;
     padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: inset 3px 5px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 3px 5px 8px rgba(0, 0, 0, 0.3);
+}
+
+#autofill-button {
+    align-self: flex-start;
+}
+
+#business-form button:hover {
+    box-shadow: inset -3px -5px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: -3px -5px 8px rgba(0, 0, 0, 0.3);
 }

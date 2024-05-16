@@ -14,7 +14,7 @@ class Router {
     }
   
     loadCurrentRoute() {
-      let path = window.location.hash.slice(1) || 'default';
+      let path = window.location.hash.slice(1) || 'businesses/list'; // Set the default route to 'businesses/list'
       console.log(`Attempting to load route: ${path}`);
       let routeFound = false;
   
@@ -34,7 +34,7 @@ class Router {
   
       if (!routeFound) {
         console.error('No route found for:', path);
-        this.navigate('default');
+        this.navigate('businesses/list'); // Navigate to the intended default route
       }
     }
   }

@@ -4,7 +4,6 @@ import ApiService from '../services/apiService.js';
 import BusinessesTab from './tabs/businesesses/businessesTab.js';
 import EventsTab from './tabs/events/eventTab.js';
 import OfficeTab from './tabs/office/officeTab.js';
-import ListBusinesses from './tabs/businesesses/listBusinesses.js';
 
 class TabManager {
   constructor(store, apiService, router) {
@@ -17,6 +16,7 @@ class TabManager {
   }
 
   setupTabs() {
+    console.log("Setting up tabs");
     this.tabs.push({ id: 'businesses/list', title: 'Businesses', instance: new BusinessesTab(this.router) });
     this.tabs.push({ id: 'events/list', title: 'Events', instance: new EventsTab(this.router) });
     this.tabs.push({ id: 'office/list', title: 'Office', instance: new OfficeTab(this.router) });
@@ -24,13 +24,16 @@ class TabManager {
     this.renderTabs();
 
     if (!window.location.hash) {
+      console.log("No hash in URL, navigating to default tab");
       this.router.navigate('businesses/list');
     } else {
+      console.log("Hash found in URL, loading current route");
       this.router.loadCurrentRoute();
     }
   }
 
   renderTabs() {
+    console.log("Rendering tabs");
     if (!this.tabContainer) {
       console.error('Tab container not found');
       return;
@@ -48,41 +51,27 @@ class TabManager {
       });
       tabElement.appendChild(linkElement);
       this.tabContainer.appendChild(tabElement);
+      console.log("TAB FOREACH TAB ID: " + tab.id);
     });
 
     // Set the active tab on page load
-    this.setActiveTab(window.location.hash.slice(1));
+    this.setActiveTab(window.location.hash.slice(1) || 'businesses/list');
   }
 
   setActiveTab(tabId) {
+    console.log(`Setting active tab: ${tabId}`);
     const links = this.tabContainer.querySelectorAll('a');
     links.forEach(link => {
       if (link.href.endsWith(`#${tabId}`)) {
         link.classList.add('active');
+        console.log(`Tab ${tabId} set to active`);
       } else {
         link.classList.remove('active');
       }
     });
   }
-
-  loadTabContent(tabId) {
-    console.log('Loading tab content for:', tabId);
-    const contentArea = document.querySelector('.tab-content');
-    if (contentArea) {
-      // Clear existing content
-      contentArea.innerHTML = '';
-
-      // Render content based on the active tab
-      if (tabId === 'businesses/list') {
-        const listBusinesses = new ListBusinesses();
-        contentArea.appendChild(listBusinesses.render());
-      } else {
-        contentArea.innerHTML = `<div>Content for ${tabId}</div>`;
-      }
-    }
-    this.setActiveTab(tabId);
-  }
 }
 
 export default TabManager;
+
 
