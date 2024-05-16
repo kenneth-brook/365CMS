@@ -89,7 +89,7 @@ class BusinessesTab {
     const zipCode = document.getElementById('zipCode').value;
 
     const address = `${streetAddress}, ${city}, ${state}, ${zipCode}`;
-    const apiKey = 'AIzaSyAGefyRhxQki08cpUEvDe4dTBh0N8YGArc'; // Replace with your actual API key
+    const apiKey = ''; // Replace with your actual API key
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
