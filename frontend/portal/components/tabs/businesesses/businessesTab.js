@@ -2,6 +2,8 @@ import { getBusinessForm } from './getBusinessForm.js';
 //import EditBusiness from './EditBusiness.js';
 import ListBusinesses from './listBusinesses.js';
 
+import config from '../../../utils/config.js'
+
 class BusinessesTab {
   constructor(router) {
     this.router = router;
@@ -89,7 +91,7 @@ class BusinessesTab {
     const zipCode = document.getElementById('zipCode').value;
 
     const address = `${streetAddress}, ${city}, ${state}, ${zipCode}`;
-    const apiKey = ''; // Replace with your actual API key
+    const apiKey = config.google; // Replace with your actual API key
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
