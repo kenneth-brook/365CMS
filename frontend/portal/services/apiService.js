@@ -17,8 +17,10 @@ class ApiService {
         }
   
         if (!response.ok) {
-          throw new Error('Network response was not ok.');
-        }
+          const errorResponse = await response.text(); // Capture response text for more details
+          console.error('Response not OK:', response.status, response.statusText, errorResponse);
+          throw new Error('Network response was not ok. Status: ' + response.status + ' ' + response.statusText + ' - ' + errorResponse);
+      }
   
         return await response.json();
       } catch (error) {

@@ -1,3 +1,4 @@
+import ApiService from '../../../services/apiService.js';
 import { renderAddressSection } from './sections/renderAddressSection.js';
 import { renderCoordinatesSection, attachCoordinatesHandler } from './sections/renderCoordinatesSection.js';
 import { renderContactSection } from './sections/renderContactSection.js';
@@ -5,6 +6,8 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './sections/
 import { renderLogoUploadSection, attachLogoUploadHandler } from './sections/renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './sections/renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDescriptionSection.js';
+
+const apiService = new ApiService();
 
 export const getBusinessForm = () => {
   const formContainer = document.createElement('div');
@@ -60,22 +63,17 @@ const handleFormSubmission = async (event) => {
 
   // Include image files
   const imageFiles = Array.from(form.querySelector('#imageUpload').files);
-  imageFiles.forEach((file, index) => {
-    formData.append(`imageFile${index}`, file);
+  imageFiles.forEach((file) => {
+    formData.append('imageFiles', file); // Ensure 'imageFiles' matches the field name expected by Multer
   });
 
-  // Handle form submission (e.g., send formData to the server)
   try {
-    const response = await fetch('/api/businesses', {
+    const options = {
       method: 'POST',
       body: formData,
-    });
+    };
 
-    if (!response.ok) {
-      throw new Error('Failed to submit the form');
-    }
-
-    const result = await response.json();
+    const result = await apiService.fetch('form-submission', options);
     console.log('Form submitted successfully:', result);
     // Handle success (e.g., display a success message, redirect, etc.)
   } catch (error) {
@@ -83,3 +81,4 @@ const handleFormSubmission = async (event) => {
     // Handle error (e.g., display an error message)
   }
 };
+

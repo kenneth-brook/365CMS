@@ -8,14 +8,20 @@ const { pool } = require('../db');
 
 // Set up Multer for file uploads
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }).fields([
+  { name: 'logo', maxCount: 1 }, 
+  { name: 'imageFiles', maxCount: 10 }
+]);
 
 // Middleware to check JWT
 router.use(checkJwt);
 
 // Handle form submission
-router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'imageFiles', maxCount: 10 }]), async (req, res) => {
+router.post('/', upload, async (req, res) => {
     try {
+        console.log('Request body:', req.body);
+        console.log('Request files:', req.files);
+
         const {
             businessName,
             active,
