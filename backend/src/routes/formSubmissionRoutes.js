@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
 const { checkJwt } = require('../middlewares/auth');
 const { pool } = require('../db');
 
@@ -12,7 +14,7 @@ const upload = multer({ storage: storage });
 router.use(checkJwt);
 
 // Handle form submission
-router.post('/', upload.array('imageFiles'), async (req, res) => {
+router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'imageFiles', maxCount: 10 }]), async (req, res) => {
     try {
         const {
             businessName,
@@ -46,8 +48,41 @@ router.post('/', upload.array('imageFiles'), async (req, res) => {
         // Parse active status boolean
         const isActive = active === 'true';
 
+        // Function to upload a file to the PHP server
+        const uploadFile = async (file) => {
+            const form = new FormData();
+            form.append('image', file.buffer, {
+                filename: file.originalname,
+                contentType: file.mimetype
+            });
+
+            const response = await axios.post('http://dev.365easyflow.com/easyflow-images/upload.php', form, {
+                headers: {
+                    ...form.getHeaders()
+                }
+            });
+
+            if (response.data.message.includes("uploaded")) {
+                return `http://dev.365easyflow.com/easyflow-images/uploads/${file.originalname}`;
+            } else {
+                throw new Error('Failed to upload image');
+            }
+        };
+
+        // Collect logo URL
+        let logoUrl = null;
+        if (req.files['logo'] && req.files['logo'][0]) {
+            logoUrl = await uploadFile(req.files['logo'][0]);
+        }
+
         // Collect image URLs
-        const imageUrls = req.files.map(file => `https://your-storage-service-url/${file.originalname}`);
+        const imageUrls = [];
+        if (req.files['imageFiles']) {
+            for (const file of req.files['imageFiles']) {
+                const url = await uploadFile(file);
+                imageUrls.push(url);
+            }
+        }
 
         // Start a transaction
         const client = await pool.connect();
@@ -56,9 +91,9 @@ router.post('/', upload.array('imageFiles'), async (req, res) => {
 
             // Insert business data
             const businessResult = await client.query(
-                `INSERT INTO businesses (active, name, street_address, mailing_address, city, state, zip, lat, long, phone, email, web, social_platforms, images, description, chamber_member)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
-                [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, socialMediaArray, imageUrls, description, isChamberMember]
+                `INSERT INTO businesses (active, name, street_address, mailing_address, city, state, zip, lat, long, phone, email, web, social_platforms, images, description, chamber_member, logo)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
+                [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, socialMediaArray, imageUrls, description, isChamberMember, logoUrl]
             );
 
             await client.query('COMMIT');
