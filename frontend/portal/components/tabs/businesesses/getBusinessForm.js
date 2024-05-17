@@ -38,5 +38,48 @@ export const getBusinessForm = () => {
     initializeTinyMCE();
   }, 0);
 
+  // Attach the form submission handler
+  const form = formContainer.querySelector('#business-form');
+  form.addEventListener('submit', handleFormSubmission);
+
   return formContainer;
+};
+
+// Function to handle form submission
+const handleFormSubmission = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  // Include the logo file
+  const logoFile = form.querySelector('#logoUpload').files[0];
+  if (logoFile) {
+    formData.append('logo', logoFile);
+  }
+
+  // Include image files
+  const imageFiles = Array.from(form.querySelector('#imageUpload').files);
+  imageFiles.forEach((file, index) => {
+    formData.append(`imageFile${index}`, file);
+  });
+
+  // Handle form submission (e.g., send formData to the server)
+  try {
+    const response = await fetch('/api/businesses', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit the form');
+    }
+
+    const result = await response.json();
+    console.log('Form submitted successfully:', result);
+    // Handle success (e.g., display a success message, redirect, etc.)
+  } catch (error) {
+    console.error('Error submitting the form:', error);
+    // Handle error (e.g., display an error message)
+  }
 };
