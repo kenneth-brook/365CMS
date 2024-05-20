@@ -3,15 +3,17 @@ $target_dir = "uploads/";
 if (!file_exists($target_dir)) {
     mkdir($target_dir, 0777, true);
 }
-$target_file = $target_dir . basename($_FILES["image"]["name"]);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-        echo json_encode(["message" => "The file " . basename($_FILES["image"]["name"]) . " has been uploaded."]);
+$upload_results = [];
+
+foreach ($_FILES["imageFiles"]["tmp_name"] as $key => $tmp_name) {
+    $target_file = $target_dir . basename($_FILES["imageFiles"]["name"][$key]);
+    if (move_uploaded_file($tmp_name, $target_file)) {
+        $upload_results[] = "The file " . basename($_FILES["imageFiles"]["name"][$key]) . " has been uploaded.";
     } else {
-        echo json_encode(["message" => "Sorry, there was an error uploading your file."]);
+        $upload_results[] = "Sorry, there was an error uploading your file " . basename($_FILES["imageFiles"]["name"][$key]) . ".";
     }
-} else {
-    echo json_encode(["message" => "Invalid request method."]);
 }
+
+echo json_encode($upload_results);
 ?>

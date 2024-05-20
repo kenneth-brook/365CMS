@@ -9,10 +9,114 @@ import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDe
 
 const apiService = new ApiService();
 
+const getUniqueFilename = (filename) => {
+  const date = new Date().toISOString().replace(/[-:.]/g, '');
+  return `${date}_${filename}`;
+};
+
+const uploadFilesToDreamHost = async (formData) => {
+  try {
+    const response = await fetch('https://dev.365easyflow.com/easyflow-images/upload.php', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log('Files uploaded successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    throw error;
+  }
+};
+
+const handleFormSubmission = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData();
+
+  // Include the logo file
+  const logoFile = form.querySelector('#logoUpload').files[0];
+  if (logoFile) {
+    const uniqueLogoFilename = getUniqueFilename(logoFile.name);
+    formData.append('imageFiles[]', new File([logoFile], uniqueLogoFilename, { type: logoFile.type }));
+  }
+
+  // Include image files
+  const imageFiles = Array.from(form.querySelector('#imageUpload').files);
+  imageFiles.forEach((file) => {
+    const uniqueImageFilename = getUniqueFilename(file.name);
+    formData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
+  });
+
+  // Log the FormData key-value pairs
+  console.log('FormData before upload:');
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ': ', pair[1]);
+    if (pair[1] instanceof File) {
+      console.log(' - File details: ', {
+        name: pair[1].name,
+        type: pair[1].type,
+        size: pair[1].size
+      });
+    }
+  }
+
+  try {
+    // Upload files to DreamHost
+    const uploadResult = await uploadFilesToDreamHost(formData);
+    const uploadedFiles = uploadResult
+      .filter((message) => message.includes('uploaded'))
+      .map((message) => {
+        const fileName = message.split(' ')[2];
+        return `https://dev.365easyflow.com/easyflow-images/uploads/${fileName}`;
+      });
+
+    // Prepare the rest of the form data to send to Lambda
+    const formDataToSend = {
+      businessName: form.businessName?.value || '',
+      active: form.active?.checked || false,
+      streetAddress: form.streetAddress?.value || '',
+      mailingAddress: form.mailingAddress?.value || '',
+      city: form.city?.value || '',
+      state: form.state?.value || '',
+      zipCode: form.zipCode?.value || '',
+      latitude: form.latitude?.value || '',
+      longitude: form.longitude?.value || '',
+      phone: form.phone?.value || '',
+      email: form.email?.value || '',
+      website: form.website?.value || '',
+      socialMedia: form.socialMedia?.value || '[]', // Ensure default value is an empty array
+      description: form.description?.value || '',
+      chamberMember: form.chamberMember?.checked || false,
+      logoUrl: uploadedFiles[0] || null, // Assuming the first file is the logo
+      imageUrls: uploadedFiles.slice(1) // Rest are image files
+    };
+
+    console.log('FormData to send to Lambda:', formDataToSend);
+
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(formDataToSend),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const result = await apiService.fetch('form-submission', options);
+    console.log('Form submitted successfully:', result);
+    // Handle success (e.g., display a success message, redirect, etc.)
+  } catch (error) {
+    console.error('Error submitting the form:', error);
+    // Handle error (e.g., display an error message)
+  }
+};
+
 export const getBusinessForm = () => {
   const formContainer = document.createElement('div');
   formContainer.innerHTML = `
-    <form id="business-form">
+    <form id="business-form" enctype="multipart/form-data">
       <div class="form-section">
         <div class="form-toggle">
           <label id="toggle-label">Company is currently <span id="toggle-status" style="color: red;">Inactive</span></label>
@@ -29,9 +133,9 @@ export const getBusinessForm = () => {
       <button type="submit">Save Business</button>
     </form>
   `;
-  
+
   attachSocialMediaHandlers(formContainer); // Attach event handlers for social media section
-  attachImageUploadHandler(formContainer); // Attach event handler for image uploads
+  attachImageUploadHandler(formContainer, handleFormSubmission); // Attach event handler for image uploads
   attachLogoUploadHandler(formContainer);  // Attach event handler for logo upload
   attachCoordinatesHandler(formContainer); // Attach event handler for coordinates section
 
@@ -47,38 +151,3 @@ export const getBusinessForm = () => {
 
   return formContainer;
 };
-
-// Function to handle form submission
-const handleFormSubmission = async (event) => {
-  event.preventDefault();
-
-  const form = event.target;
-  const formData = new FormData(form);
-
-  // Include the logo file
-  const logoFile = form.querySelector('#logoUpload').files[0];
-  if (logoFile) {
-    formData.append('logo', logoFile);
-  }
-
-  // Include image files
-  const imageFiles = Array.from(form.querySelector('#imageUpload').files);
-  imageFiles.forEach((file) => {
-    formData.append('imageFiles', file); // Ensure 'imageFiles' matches the field name expected by Multer
-  });
-
-  try {
-    const options = {
-      method: 'POST',
-      body: formData,
-    };
-
-    const result = await apiService.fetch('form-submission', options);
-    console.log('Form submitted successfully:', result);
-    // Handle success (e.g., display a success message, redirect, etc.)
-  } catch (error) {
-    console.error('Error submitting the form:', error);
-    // Handle error (e.g., display an error message)
-  }
-};
-
