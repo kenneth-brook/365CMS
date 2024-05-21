@@ -30,11 +30,11 @@ const uploadFilesToDreamHost = async (formData) => {
   }
 };
 
-const handleFormSubmission = async (event) => {
+const handleFormSubmission = async (event, imageFiles) => {
   event.preventDefault();
 
   const form = event.target;
-  const formData = new FormData();
+  const formData = new FormData(form);
 
   // Include the logo file
   const logoFile = form.querySelector('#logoUpload').files[0];
@@ -44,7 +44,6 @@ const handleFormSubmission = async (event) => {
   }
 
   // Include image files
-  const imageFiles = Array.from(form.querySelector('#imageUpload').files);
   imageFiles.forEach((file) => {
     const uniqueImageFilename = getUniqueFilename(file.name);
     formData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
@@ -73,6 +72,8 @@ const handleFormSubmission = async (event) => {
         return `https://dev.365easyflow.com/easyflow-images/uploads/${fileName}`;
       });
 
+    console.log('Uploaded Files URLs:', uploadedFiles);
+
     // Prepare the rest of the form data to send to Lambda
     const formDataToSend = {
       businessName: form.businessName?.value || '',
@@ -87,7 +88,7 @@ const handleFormSubmission = async (event) => {
       phone: form.phone?.value || '',
       email: form.email?.value || '',
       website: form.website?.value || '',
-      socialMedia: form.socialMedia?.value || '[]', // Ensure default value is an empty array
+      socialMedia: form.querySelector('input[name="socialMedia"]').value || '[]', // Ensure default value is an empty array
       description: form.description?.value || '',
       chamberMember: form.chamberMember?.checked || false,
       logoUrl: uploadedFiles[0] || null, // Assuming the first file is the logo
@@ -134,8 +135,8 @@ export const getBusinessForm = () => {
     </form>
   `;
 
+  const imageFiles = attachImageUploadHandler(formContainer); // Get image files array
   attachSocialMediaHandlers(formContainer); // Attach event handlers for social media section
-  attachImageUploadHandler(formContainer, handleFormSubmission); // Attach event handler for image uploads
   attachLogoUploadHandler(formContainer);  // Attach event handler for logo upload
   attachCoordinatesHandler(formContainer); // Attach event handler for coordinates section
 
@@ -147,7 +148,7 @@ export const getBusinessForm = () => {
 
   // Attach the form submission handler
   const form = formContainer.querySelector('#business-form');
-  form.addEventListener('submit', handleFormSubmission);
+  form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
 
   return formContainer;
 };

@@ -11,7 +11,7 @@ export const renderImageUploadSection = () => {
   `;
 };
 
-export const attachImageUploadHandler = (formContainer, handleFormSubmission) => {
+export const attachImageUploadHandler = (formContainer) => {
   const imageUploadInput = formContainer.querySelector('#imageUpload');
   const imageThumbnailsContainer = formContainer.querySelector('#image-thumbnails');
   const imageFileListContainer = formContainer.querySelector('#image-file-list');
@@ -20,7 +20,7 @@ export const attachImageUploadHandler = (formContainer, handleFormSubmission) =>
 
   imageUploadInput.addEventListener('change', () => {
     const files = imageUploadInput.files;
-    
+
     Array.from(files).forEach(file => {
       imageFiles.push(file);
 
@@ -77,29 +77,5 @@ export const attachImageUploadHandler = (formContainer, handleFormSubmission) =>
     });
   });
 
-  // Attach to form submission to include image files
-  const form = formContainer.querySelector('#business-form');
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-    imageFiles.forEach((file) => {
-      formData.append('imageFiles', file);
-    });
-
-    // Log the FormData key-value pairs
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ', pair[1]);
-      if (pair[1] instanceof File) {
-        console.log(' - File details: ', {
-          name: pair[1].name,
-          type: pair[1].type,
-          size: pair[1].size
-        });
-      }
-    }
-
-    // Handle form submission
-    handleFormSubmission(event);
-  });
+  return imageFiles; // Return imageFiles array to be used in form submission
 };

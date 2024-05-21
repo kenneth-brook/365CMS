@@ -42,7 +42,14 @@ router.post('/', async (req, res) => {
     }
 
     // Parse social media data if present
-    const socialMediaArray = socialMedia ? JSON.parse(socialMedia) : [];
+    let socialMediaArray = [];
+    try {
+      socialMediaArray = socialMedia ? JSON.parse(socialMedia) : [];
+      console.log('Parsed social media array:', socialMediaArray);
+    } catch (parseError) {
+      console.error('Error parsing social media JSON:', parseError);
+      return res.status(400).json({ error: 'Invalid JSON format for social media' });
+    }
 
     // Parse chamber member boolean
     const isChamberMember = chamberMember === 'true';
@@ -62,7 +69,7 @@ router.post('/', async (req, res) => {
       const businessResult = await client.query(
         `INSERT INTO businesses (active, name, street_address, mailing_address, city, state, zip, lat, long, phone, email, web, social_platforms, images, description, chamber_member, logo)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
-        [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, socialMediaArray, imageUrls, description, isChamberMember, logoUrl]
+        [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, JSON.stringify(socialMediaArray), imageUrls, description, isChamberMember, logoUrl]
       );
 
       await client.query('COMMIT');
