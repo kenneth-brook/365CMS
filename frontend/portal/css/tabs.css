@@ -119,7 +119,7 @@ input[type="checkbox"] {
     margin-right: 5px;  /* Spacing before the label text */
 }
 
-input[type="submit"] {
+input[type="submit"], button[type="submit"] {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -129,7 +129,7 @@ input[type="submit"] {
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, button[type="submit"]:hover {
     background-color: #45a049;
 }
 
@@ -144,13 +144,13 @@ input[type="submit"]:hover {
     border-bottom: none;
 }
 
-#business-form {
+form {
     display: flex;
     flex-direction: column;
     align-items: center;  /* Centers the children (form sections and submit button) horizontally */
 }
 
-#business-form button {
+form button {
     background-color: #55B84B;
     color: white;
     font-size: 1.8rem;
@@ -165,60 +165,60 @@ input[type="submit"]:hover {
     align-self: flex-start;
 }
 
-#business-form button:hover {
+form button:hover {
     box-shadow: inset -3px -5px 8px rgba(0, 0, 0, 0.3);
     text-shadow: -3px -5px 8px rgba(0, 0, 0, 0.3);
 }
 
 #social-media-section .form-group {
     width: 45%;
-  }
-  
-  #social-media-list {
+}
+
+#social-media-list {
     list-style: none;
     padding: 0;
     margin-top: 20px;
     width: 100%;
-  }
-  
-  #social-media-list li {
+}
+
+#social-media-list li {
     background-color: #f4f4f4;
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  #image-thumbnails {
+#image-thumbnails {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
-  }
-  
-  #image-thumbnails img.thumbnail {
+}
+
+#image-thumbnails img.thumbnail {
     width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
+}
 
-  #image-file-list {
+#image-file-list {
     list-style: none;
     padding: 0;
     margin-top: 10px;
-  }
-  
-  #image-file-list li {
+}
+
+#image-file-list li {
     background-color: #f4f4f4;
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .description-section {
+.description-section {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
@@ -248,16 +248,16 @@ input[type="submit"]:hover {
     position: relative;
     display: inline-block;
     margin: 5px;
-  }
-  
-  .thumbnail {
+}
+
+.thumbnail {
     width: 100px;
     height: 100px;
     object-fit: cover;
     cursor: pointer;
-  }
-  
-  .enlarge-thumbnail {
+}
+
+.enlarge-thumbnail {
     position: absolute;
     width: 300px;
     height: 300px;
@@ -265,9 +265,9 @@ input[type="submit"]:hover {
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     z-index: 1000;
-  }
-  
-  .remove-button {
+}
+
+.remove-button {
     display: block;
     margin-top: 5px;
     background-color: #ff0000 !important;
@@ -277,8 +277,26 @@ input[type="submit"]:hover {
     border-radius: 3px;
     cursor: pointer;
     font-size: 1.3rem !important;
-  }
-  
-  .remove-button:hover {
+}
+
+.remove-button:hover {
     background-color: #cc0000 !important;
-  }
+}
+
+.additional-info-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.additional-info-container select {
+    width: 40%;
+    padding: 8px;
+    margin-right: 10px;
+}
+
+.additional-info-container button {
+    padding: 8px 16px;
+    cursor: pointer;
+}

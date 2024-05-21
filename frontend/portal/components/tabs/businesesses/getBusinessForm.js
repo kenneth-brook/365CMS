@@ -8,7 +8,7 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './sections/
 import { renderLogoUploadSection, attachLogoUploadHandler } from './sections/renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './sections/renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDescriptionSection.js';
-import { renderAdditionalSection } from './renderAditionalSection.js';
+import { renderAdditionalSection } from './renderAdditionalSection.js';
 
 const apiService = new ApiService();
 
@@ -35,25 +35,25 @@ const uploadFilesToDreamHost = async (formData) => {
 const handleFormSubmission = async (event, imageFiles) => {
   event.preventDefault();
 
-  const form = event.target;
-  const formData = new FormData(form);
+  const formContainer = document.getElementById('form-container');
+  const forms = formContainer.querySelectorAll('form');
+  const allFormData = new FormData();
 
-  // Include the logo file
-  const logoFile = form.querySelector('#logoUpload').files[0];
-  if (logoFile) {
-    const uniqueLogoFilename = getUniqueFilename(logoFile.name);
-    formData.append('imageFiles[]', new File([logoFile], uniqueLogoFilename, { type: logoFile.type }));
-  }
+  forms.forEach(form => {
+    const formData = new FormData(form);
+    for (let [key, value] of formData.entries()) {
+      allFormData.append(key, value);
+    }
+  });
 
   // Include image files
   imageFiles.forEach((file) => {
     const uniqueImageFilename = getUniqueFilename(file.name);
-    formData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
+    allFormData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
   });
 
   try {
-    // Upload files to DreamHost
-    const uploadResult = await uploadFilesToDreamHost(formData);
+    const uploadResult = await uploadFilesToDreamHost(allFormData);
     const uploadedFiles = uploadResult
       .filter((message) => message.includes('uploaded'))
       .map((message) => {
@@ -61,29 +61,10 @@ const handleFormSubmission = async (event, imageFiles) => {
         return `https://dev.365easyflow.com/easyflow-images/uploads/${fileName}`;
       });
 
-    // Prepare the rest of the form data to send to Lambda
     const formDataToSend = {
-      businessName: form.businessName?.value || '',
-      active: form.active?.checked || false,
-      streetAddress: form.streetAddress?.value || '',
-      mailingAddress: form.mailingAddress?.value || '',
-      city: form.city?.value || '',
-      state: form.state?.value || '',
-      zipCode: form.zipCode?.value || '',
-      latitude: form.latitude?.value || '',
-      longitude: form.longitude?.value || '',
-      phone: form.phone?.value || '',
-      email: form.email?.value || '',
-      website: form.website?.value || '',
-      socialMedia: form.querySelector('input[name="socialMedia"]').value || '[]', // Ensure default value is an empty array
-      description: form.description?.value || '',
-      chamberMember: form.chamberMember?.checked || false,
-      logoUrl: uploadedFiles[0] || null, // Assuming the first file is the logo
-      imageUrls: uploadedFiles.slice(1), // Rest are image files
-      additionalSections: Array.from(form.querySelectorAll('.additional-sections .form-section')).map(section => ({
-          sectionId: section.querySelector('input[name="additionalSectionId[]"]').value,
-          additionalField: section.querySelector('input[name="additionalField[]"]').value
-      }))
+      ...Object.fromEntries(allFormData.entries()),
+      logoUrl: uploadedFiles[0] || null,
+      imageUrls: uploadedFiles.slice(1),
     };
 
     const options = {
@@ -103,45 +84,67 @@ const handleFormSubmission = async (event, imageFiles) => {
 };
 
 const fetchAdditionalOptions = async () => {
+  try {
     const dropdown = document.getElementById('additionalDropdown');
-    try {
-        // Simulated options fetched from the API
-        const options = [
-            { id: 'eat', name: 'Eat' },
-            { id: 'stay', name: 'Stay' },
-            { id: 'play', name: 'Play' },
-            { id: 'shop', name: 'Shop' },
-            { id: 'other', name: 'Other' }
-        ];
-        
-        options.forEach(option => {
-            const opt = document.createElement('option');
-            opt.value = option.id;
-            opt.textContent = option.name;
-            dropdown.appendChild(opt);
-        });
-    } catch (error) {
-        console.error('Error fetching additional options:', error);
+    if (!dropdown) {
+      console.error('Dropdown element not found');
+      return;
     }
+
+    const options = await apiService.fetch('category-type');
+    options.forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option.category_name.toLowerCase(); // Use category_name as the value, converted to lowercase
+      opt.textContent = option.category_name; // Use category_name as the display text
+      dropdown.appendChild(opt);
+    });
+  } catch (error) {
+    console.error('Error fetching additional options:', error);
+  }
 };
 
 const addAdditionalSection = () => {
-    const dropdown = document.getElementById('additionalDropdown');
-    const selectedValue = dropdown.value;
-    const additionalSectionsContainer = document.querySelector('.additional-sections');
+  const dropdown = document.getElementById('additionalDropdown');
+  const selectedValue = dropdown.value;
+  const selectedText = dropdown.options[dropdown.selectedIndex].text;
+  const additionalSectionsContainer = document.querySelector('.additional-sections');
 
-    // Create a new section based on the selected value
-    const section = document.createElement('div');
-    section.className = 'form-section';
-    section.innerHTML = renderAdditionalSection(selectedValue);
-    additionalSectionsContainer.appendChild(section);
+  // Log the selected value and text for debugging
+  console.log(`Selected value: ${selectedValue}`);
+  console.log(`Selected text: ${selectedText}`);
+  
+  // Create a new section based on the selected value
+  const section = document.createElement('div');
+  section.className = 'additional-section';
+  const sectionContent = renderAdditionalSection(selectedValue);
 
-    // Enable the Save button
-    document.getElementById('saveBusinessButton').disabled = false;
+  // Log the section content for debugging
+  console.log(`Section content: ${sectionContent}`);
+  
+  section.innerHTML = `
+    <form class="additional-form">
+      <div class="form-section">
+        <h3>Business Category: ${selectedText}</h3>
+      </div>
+      <div class="form-section">
+        ${sectionContent}
+      </div>
+    </form>
+  `;
+
+  additionalSectionsContainer.appendChild(section);
+  console.log('Appended section:', section);
+
+  // Hide the dropdown and button
+  document.querySelector('.additional-info-container').style.display = 'none';
+
+  // Enable the Save button
+  document.getElementById('saveBusinessButton').disabled = false;
 };
 
 export const getBusinessForm = () => {
   const formContainer = document.createElement('div');
+  formContainer.id = 'form-container';
   formContainer.innerHTML = `
     <form id="business-form" enctype="multipart/form-data">
       <div class="form-section">
@@ -157,14 +160,20 @@ export const getBusinessForm = () => {
       ${renderLogoUploadSection()}
       ${renderImageUploadSection()}
       ${renderDescriptionSection()}
-      <div class="additional-sections"></div>
-      <div class="form-section">
-        <label for="additionalDropdown">Primary Business Category</label>
-        <select id="additionalDropdown" name="additionalDropdown"></select>
-        <button type="button" id="addSectionButton">Add</button>
-      </div>
-      <button type="submit" id="saveBusinessButton" disabled>Save Business</button>
     </form>
+    <form> <!-- Start the new form here -->
+    <div class="additional-sections"></div>
+    <div class="form-section additional-info-container">
+      <label for="additionalDropdown">Additional Information</label>
+      <select id="additionalDropdown" name="additionalDropdown">
+        <option value="" disabled selected>Select a Category to Add to Continue</option>
+      </select>
+      <button type="button" id="addSectionButton">Add</button>
+    </div>
+    </form>
+    <div id="saveButtonContainer" class="form-section">
+      <button type="submit" id="saveBusinessButton" disabled>Save Business</button>
+    </div>
   `;
 
   const imageFiles = attachImageUploadHandler(formContainer);
@@ -174,13 +183,11 @@ export const getBusinessForm = () => {
 
   setTimeout(() => {
     initializeTinyMCE();
+    fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
   }, 0);
 
   const form = formContainer.querySelector('#business-form');
   form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
-
-  // Fetch additional options for the dropdown
-  fetchAdditionalOptions();
 
   // Add event listener for the add button
   const addSectionButton = formContainer.querySelector('#addSectionButton');

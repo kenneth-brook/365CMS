@@ -7,6 +7,7 @@ import { renderShopSection } from './sections/renderShopSection.js';
 import { renderOtherSection } from './sections/renderOtherSection.js';
 
 export const renderAdditionalSection = (sectionId) => {
+  console.log(sectionId)
   switch (sectionId) {
     case 'eat':
       return renderEatSection();
