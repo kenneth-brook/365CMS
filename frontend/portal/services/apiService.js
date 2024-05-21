@@ -7,7 +7,6 @@ class ApiService {
       options.credentials = 'include';  // Ensure credentials are included in every request
   
       try {
-        console.log('address called: ' + this.baseURL + url);
         const response = await fetch(this.baseURL + url, options);
   
         if (response.status === 401) {

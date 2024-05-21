@@ -22,7 +22,6 @@ const uploadFilesToDreamHost = async (formData) => {
     });
 
     const result = await response.json();
-    console.log('Files uploaded successfully:', result);
     return result;
   } catch (error) {
     console.error('Error uploading files:', error);
@@ -49,19 +48,6 @@ const handleFormSubmission = async (event, imageFiles) => {
     formData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
   });
 
-  // Log the FormData key-value pairs
-  console.log('FormData before upload:');
-  for (let pair of formData.entries()) {
-    console.log(pair[0] + ': ', pair[1]);
-    if (pair[1] instanceof File) {
-      console.log(' - File details: ', {
-        name: pair[1].name,
-        type: pair[1].type,
-        size: pair[1].size
-      });
-    }
-  }
-
   try {
     // Upload files to DreamHost
     const uploadResult = await uploadFilesToDreamHost(formData);
@@ -71,8 +57,6 @@ const handleFormSubmission = async (event, imageFiles) => {
         const fileName = message.split(' ')[2];
         return `https://dev.365easyflow.com/easyflow-images/uploads/${fileName}`;
       });
-
-    console.log('Uploaded Files URLs:', uploadedFiles);
 
     // Prepare the rest of the form data to send to Lambda
     const formDataToSend = {
@@ -95,8 +79,6 @@ const handleFormSubmission = async (event, imageFiles) => {
       imageUrls: uploadedFiles.slice(1) // Rest are image files
     };
 
-    console.log('FormData to send to Lambda:', formDataToSend);
-
     const options = {
       method: 'POST',
       body: JSON.stringify(formDataToSend),
@@ -106,7 +88,6 @@ const handleFormSubmission = async (event, imageFiles) => {
     };
 
     const result = await apiService.fetch('form-submission', options);
-    console.log('Form submitted successfully:', result);
     // Handle success (e.g., display a success message, redirect, etc.)
   } catch (error) {
     console.error('Error submitting the form:', error);
@@ -142,7 +123,6 @@ export const getBusinessForm = () => {
 
   // Initialize TinyMCE after the form is rendered
   setTimeout(() => {
-    console.log("Initializing TinyMCE");
     initializeTinyMCE();
   }, 0);
 

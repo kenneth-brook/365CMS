@@ -6,13 +6,6 @@ const { getDbPool } = require('../db');
 // Middleware to check JWT
 router.use(checkJwt);
 
-router.use((req, res, next) => {
-    console.log('Incoming Request:');
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
-    next();
-});
-
 // Handle form submission
 router.post('/', async (req, res) => {
   try {
@@ -45,7 +38,6 @@ router.post('/', async (req, res) => {
     let socialMediaArray = [];
     try {
       socialMediaArray = socialMedia ? JSON.parse(socialMedia) : [];
-      console.log('Parsed social media array:', socialMediaArray);
     } catch (parseError) {
       console.error('Error parsing social media JSON:', parseError);
       return res.status(400).json({ error: 'Invalid JSON format for social media' });

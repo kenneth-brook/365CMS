@@ -29,12 +29,10 @@ class BusinessesTab {
   }
 
   showAddBusiness() {
-    console.log("Showing add business form");
     this.addBusinessForm();
   }
 
   showEditBusiness(id) {
-    console.log("Showing edit business form for ID:", id);
     const contentArea = document.querySelector('.tab-content');
     if (!contentArea) {
       console.error("Content area element not found");
@@ -65,7 +63,6 @@ class BusinessesTab {
 
     if (toggle && statusSpan) {
       toggle.addEventListener('change', function() {
-        console.log("Toggle state changed.");
         if (this.checked) {
           statusSpan.textContent = "Active";
           statusSpan.style.color = "green";
@@ -103,7 +100,6 @@ class BusinessesTab {
         const location = data.results[0].geometry.location;
         document.getElementById('latitude').value = location.lat;
         document.getElementById('longitude').value = location.lng;
-        console.log("Autofill successful:", location);
       } else {
         console.error("Geocode was not successful for the following reason:", data.status);
       }
