@@ -6,6 +6,7 @@ const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
 const role = require('./routes/role');
 const formSubmissionRoutes = require('./routes/formSubmissionRoutes');
+const categoryTypeRoutes = require('./routes/categoryTypeRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -27,6 +28,7 @@ app.use('/login', authRoutes);
 app.use('/setup', setupRoutes);
 app.use('/user-role', role);
 app.use('/form-submission', formSubmissionRoutes);
+app.use('/category-type', categoryTypeRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
