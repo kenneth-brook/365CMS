@@ -139,6 +139,12 @@ input[type="submit"]:hover, button[type="submit"]:hover {
     border-bottom: 2px solid black; /* Adds a black bottom border to each section */
 }
 
+.additional-form {
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 2px solid black;
+}
+
 /* Ensure the last section does not have a bottom border if not needed */
 .form-section:last-child {
     border-bottom: none;
@@ -150,7 +156,7 @@ form {
     align-items: center;  /* Centers the children (form sections and submit button) horizontally */
 }
 
-form button {
+form button, #saveBusinessButton {
     background-color: #55B84B;
     color: white;
     font-size: 1.8rem;
@@ -159,6 +165,10 @@ form button {
     border-radius: 5px;
     box-shadow: inset 3px 5px 8px rgba(0, 0, 0, 0.3);
     text-shadow: 3px 5px 8px rgba(0, 0, 0, 0.3);
+}
+
+#saveBusinessButton {
+    margin: 0 auto;
 }
 
 #autofill-button, #add-social-media {

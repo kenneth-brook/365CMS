@@ -2,7 +2,9 @@
 
 export const renderPlaySection = () => {
     return `
-      <p>Only fill out the fields below if they differ from the main form.</p>
+    <div style="width: 100%" class="form-message">
+    <p style="text-align: center; font-weight: bold;">Only fill out the fields below if they differ from the main form.</p>
+  </div>
       <div class="form-group">
         <label for="playBusinessName">Business Name</label>
         <input type="text" id="playBusinessName" name="playBusinessName">
@@ -18,10 +20,6 @@ export const renderPlaySection = () => {
       <div class="form-group">
         <label for="playWeb">Web</label>
         <input type="url" id="playWeb" name="playWeb">
-      </div>
-      <div class="form-group">
-        <label for="activityType">Activity Type</label>
-        <input type="text" id="activityType" name="activityType">
       </div>
     `;
   };

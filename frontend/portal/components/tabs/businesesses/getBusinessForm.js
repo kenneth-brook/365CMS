@@ -123,8 +123,8 @@ const addAdditionalSection = () => {
   
   section.innerHTML = `
     <form class="additional-form">
-      <div class="form-section">
-        <h3>Business Category: ${selectedText}</h3>
+      <div style="width: 100%; display: flex; justify-content: center;" class="form-section">
+        <h3 style="font-size: 1.6rem;">Business Category: ${selectedText}</h3>
       </div>
       <div class="form-section">
         ${sectionContent}

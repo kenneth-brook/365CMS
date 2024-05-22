@@ -2,7 +2,9 @@
 
 export const renderStaySection = () => {
     return `
-      <p>Only fill out the fields below if they differ from the main form.</p>
+    <div style="width: 100%" class="form-message">
+    <p style="text-align: center; font-weight: bold;">Only fill out the fields below if they differ from the main form.</p>
+  </div>
       <div class="form-group">
         <label for="stayBusinessName">Business Name</label>
         <input type="text" id="stayBusinessName" name="stayBusinessName">
@@ -18,10 +20,6 @@ export const renderStaySection = () => {
       <div class="form-group">
         <label for="stayWeb">Web</label>
         <input type="url" id="stayWeb" name="stayWeb">
-      </div>
-      <div class="form-group">
-        <label for="roomType">Room Type</label>
-        <input type="text" id="roomType" name="roomType">
       </div>
     `;
   };

@@ -2,7 +2,9 @@
 
 export const renderOtherSection = () => {
     return `
-      <p>Only fill out the fields below if they differ from the main form.</p>
+    <div style="width: 100%" class="form-message">
+    <p style="text-align: center; font-weight: bold;">Only fill out the fields below if they differ from the main form.</p>
+  </div>
       <div class="form-group">
         <label for="otherBusinessName">Business Name</label>
         <input type="text" id="otherBusinessName" name="otherBusinessName">
@@ -18,10 +20,6 @@ export const renderOtherSection = () => {
       <div class="form-group">
         <label for="otherWeb">Web</label>
         <input type="url" id="otherWeb" name="otherWeb">
-      </div>
-      <div class="form-group">
-        <label for="otherType">Other Type</label>
-        <input type="text" id="otherType" name="otherType">
       </div>
     `;
   };
