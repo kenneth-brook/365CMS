@@ -123,8 +123,8 @@ const addAdditionalSection = () => {
   
   section.innerHTML = `
     <form class="additional-form">
-      <div style="width: 100%; display: flex; justify-content: center;" class="form-section">
-        <h3 style="font-size: 1.6rem;">Business Category: ${selectedText}</h3>
+      <div class="form-section">
+        <h3>Business Category: ${selectedText}</h3>
       </div>
       <div class="form-section">
         ${sectionContent}
@@ -140,6 +140,13 @@ const addAdditionalSection = () => {
 
   // Enable the Save button
   document.getElementById('saveBusinessButton').disabled = false;
+};
+
+const selectOnlyThis = (checkbox) => {
+  const checkboxes = document.querySelectorAll('input[name="operationModel"]');
+  checkboxes.forEach((item) => {
+    if (item !== checkbox) item.checked = false;
+  });
 };
 
 export const getBusinessForm = () => {
@@ -192,6 +199,12 @@ export const getBusinessForm = () => {
   // Add event listener for the add button
   const addSectionButton = formContainer.querySelector('#addSectionButton');
   addSectionButton.addEventListener('click', addAdditionalSection);
+
+  // Add event listeners for the operation model checkboxes
+  const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
+  operationModelCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener('click', () => selectOnlyThis(checkbox));
+  });
 
   return formContainer;
 };
