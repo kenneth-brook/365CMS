@@ -1,4 +1,7 @@
-// /components/tabs/businesses/sections/renderEatSection.js
+import { renderSocialMediaSection, attachSocialMediaHandlers } from './renderSocialMediaSection.js';
+import { renderLogoUploadSection, attachLogoUploadHandler } from './renderLogoUploadSection.js';
+import { renderImageUploadSection, attachImageUploadHandler } from './renderImageUploadSection.js';
+import { renderDescriptionSection, initializeTinyMCE } from './renderDescriptionSection.js';
 
 export const renderEatSection = () => {
     return `
@@ -78,7 +81,7 @@ export const renderEatSection = () => {
               </div>
             </div>
           </div>
-        </div>
+        
         <div id="scheduleTableContainer" style="margin-top: 20px; display: none;">
           <table id="scheduleTable" border="1" style="width: 100%; text-align: center;">
             <thead>
@@ -88,6 +91,11 @@ export const renderEatSection = () => {
           </table>
         </div>
       </div>
+      ${renderSocialMediaSection()}
+      ${renderLogoUploadSection()}
+      ${renderImageUploadSection()}
+      ${renderDescriptionSection()}
+    </div>
     `;
   };
   

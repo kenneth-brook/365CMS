@@ -168,8 +168,7 @@ export const getBusinessForm = () => {
       ${renderImageUploadSection()}
       ${renderDescriptionSection()}
     </form>
-    <form> <!-- Start the new form here -->
-    <div class="additional-sections"></div>
+    <form class="additional-sections"> <!-- Start the new form here -->
     <div class="form-section additional-info-container">
       <label for="additionalDropdown">Additional Information</label>
       <select id="additionalDropdown" name="additionalDropdown">
@@ -177,10 +176,11 @@ export const getBusinessForm = () => {
       </select>
       <button type="button" id="addSectionButton">Add</button>
     </div>
-    </form>
     <div id="saveButtonContainer" class="form-section">
       <button type="submit" id="saveBusinessButton" disabled>Save Business</button>
     </div>
+    </form>
+    
   `;
 
   const imageFiles = attachImageUploadHandler(formContainer);
