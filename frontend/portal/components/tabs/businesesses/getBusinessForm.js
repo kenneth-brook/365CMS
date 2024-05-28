@@ -1,5 +1,3 @@
-// /components/tabs/businesses/getBusinessForm.js
-
 import ApiService from '../../../services/apiService.js';
 import { renderAddressSection } from './sections/renderAddressSection.js';
 import { renderCoordinatesSection, attachCoordinatesHandler } from './sections/renderCoordinatesSection.js';
@@ -108,38 +106,23 @@ const addAdditionalSection = () => {
   const selectedValue = dropdown.value;
   const selectedText = dropdown.options[dropdown.selectedIndex].text;
   const additionalSectionsContainer = document.querySelector('.additional-sections');
+  const newId = `description-${Date.now()}`; // Generate a unique ID
 
-  // Log the selected value and text for debugging
-  console.log(`Selected value: ${selectedValue}`);
-  console.log(`Selected text: ${selectedText}`);
-  
   // Create a new section based on the selected value
-  const section = document.createElement('div');
-  section.className = 'additional-section';
   const sectionContent = renderAdditionalSection(selectedValue);
 
-  // Log the section content for debugging
-  console.log(`Section content: ${sectionContent}`);
-  
-  section.innerHTML = `
-    <form class="additional-form">
-      <div class="form-section">
-        <h3>Business Category: ${selectedText}</h3>
-      </div>
-      <div class="form-section">
-        ${sectionContent}
-      </div>
-    </form>
+  additionalSectionsContainer.innerHTML += `
+    <div class="form-section">
+      <h3>Business Category: ${selectedText}</h3>
+    </div>
+    ${sectionContent}
   `;
 
-  additionalSectionsContainer.appendChild(section);
-  console.log('Appended section:', section);
+  // Initialize TinyMCE for the new text area
+  initializeTinyMCE(`#description-${newId}`);
 
   // Hide the dropdown and button
   document.querySelector('.additional-info-container').style.display = 'none';
-
-  // Enable the Save button
-  document.getElementById('saveBusinessButton').disabled = false;
 };
 
 const selectOnlyThis = (checkbox) => {
@@ -166,21 +149,17 @@ export const getBusinessForm = () => {
       ${renderSocialMediaSection()}
       ${renderLogoUploadSection()}
       ${renderImageUploadSection()}
-      ${renderDescriptionSection()}
+      ${renderDescriptionSection('initial')}
     </form>
     <form class="additional-sections"> <!-- Start the new form here -->
-    <div class="form-section additional-info-container">
-      <label for="additionalDropdown">Additional Information</label>
-      <select id="additionalDropdown" name="additionalDropdown">
-        <option value="" disabled selected>Select a Category to Add to Continue</option>
-      </select>
-      <button type="button" id="addSectionButton">Add</button>
-    </div>
-    <div id="saveButtonContainer" class="form-section">
-      <button type="submit" id="saveBusinessButton" disabled>Save Business</button>
-    </div>
+      <div class="form-section additional-info-container">
+        <label for="additionalDropdown">Additional Information</label>
+        <select id="additionalDropdown" name="additionalDropdown">
+          <option value="" disabled selected>Select a Category to Add to Continue</option>
+        </select>
+        <button type="button" id="addSectionButton">Add</button>
+      </div>
     </form>
-    
   `;
 
   const imageFiles = attachImageUploadHandler(formContainer);
@@ -189,7 +168,7 @@ export const getBusinessForm = () => {
   attachCoordinatesHandler(formContainer);
 
   setTimeout(() => {
-    initializeTinyMCE();
+    initializeTinyMCE('#description-initial');
     fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
   }, 0);
 
