@@ -1,6 +1,6 @@
 // /components/tabs/businesses/sections/renderAdditionalSection.js
 
-import { renderEatSection } from './sections/renderEatSection.js';
+/*import { renderEatSection } from './sections/renderEatSection.js';
 import { renderStaySection } from './sections/renderStaySection.js';
 import { renderPlaySection } from './sections/renderPlaySection.js';
 import { renderShopSection } from './sections/renderShopSection.js';
@@ -21,4 +21,30 @@ export const renderAdditionalSection = (sectionId) => {
     default:
       return '';
   }
+};*/
+
+
+// renderAddonSection.js
+
+import { renderCommonSections } from './sections/renderCommonSections.js';
+import { renderEatUniqueSection } from './sections/renderEatUniqueSection.js';
+// Import other unique sections as needed
+
+export const renderAddonSection = (sectionId) => {
+  const uniqueId = `description-${Date.now()}`; // Generate a unique ID
+
+  let uniqueSectionHtml = '';
+  switch (sectionId) {
+    case 'eat':
+      uniqueSectionHtml = renderEatUniqueSection();
+      break;
+    // Add cases for other sections (stay, play, shop, other) as needed
+    default:
+      uniqueSectionHtml = '';
+  }
+
+  return `
+    ${uniqueSectionHtml}
+    ${renderCommonSections(uniqueId)}
+  `;
 };
