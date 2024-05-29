@@ -2,6 +2,7 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './renderSoc
 import { renderLogoUploadSection, attachLogoUploadHandler } from './renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './renderDescriptionSection.js';
+import { renderMenuSelectionSection, attachMenuSelectionHandlers } from './renderMenuSelectionSection.js'
 
 export const renderEatSection = () => {
   const newId = `description-${Date.now()}`; // Generate a unique ID
@@ -93,6 +94,7 @@ export const renderEatSection = () => {
         </div>
       </div>
     </div>
+    ${renderMenuSelectionSection()}
     ${renderSocialMediaSection()}
     ${renderLogoUploadSection()}
     ${renderImageUploadSection()}
