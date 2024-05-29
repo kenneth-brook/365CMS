@@ -6,7 +6,7 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './sections/
 import { renderLogoUploadSection, attachLogoUploadHandler } from './sections/renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './sections/renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDescriptionSection.js';
-import { renderAdditionalSection } from './renderAdditionalSection.js';
+import { fetchAdditionalOptions, addAdditionalSection, selectOnlyThis } from '../../../utils/formUtils.js';
 
 const apiService = new ApiService();
 
@@ -44,7 +44,6 @@ const handleFormSubmission = async (event, imageFiles) => {
     }
   });
 
-  // Include image files
   imageFiles.forEach((file) => {
     const uniqueImageFilename = getUniqueFilename(file.name);
     allFormData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
@@ -81,55 +80,12 @@ const handleFormSubmission = async (event, imageFiles) => {
   }
 };
 
-const fetchAdditionalOptions = async () => {
-  try {
-    const dropdown = document.getElementById('additionalDropdown');
-    if (!dropdown) {
-      console.error('Dropdown element not found');
-      return;
-    }
-
-    const options = await apiService.fetch('category-type');
-    options.forEach(option => {
-      const opt = document.createElement('option');
-      opt.value = option.category_name.toLowerCase(); // Use category_name as the value, converted to lowercase
-      opt.textContent = option.category_name; // Use category_name as the display text
-      dropdown.appendChild(opt);
-    });
-  } catch (error) {
-    console.error('Error fetching additional options:', error);
-  }
-};
-
-const addAdditionalSection = () => {
-  const dropdown = document.getElementById('additionalDropdown');
-  const selectedValue = dropdown.value;
-  const selectedText = dropdown.options[dropdown.selectedIndex].text;
-  const additionalSectionsContainer = document.querySelector('.additional-sections');
-  const newId = `description-${Date.now()}`; // Generate a unique ID
-
-  // Create a new section based on the selected value
-  const sectionContent = renderAdditionalSection(selectedValue);
-
-  additionalSectionsContainer.innerHTML += `
-    <div class="form-section">
-      <h3>Business Category: ${selectedText}</h3>
-    </div>
-    ${sectionContent}
-  `;
-
-  // Initialize TinyMCE for the new text area
-  initializeTinyMCE(`#description-${newId}`);
-
-  // Hide the dropdown and button
-  document.querySelector('.additional-info-container').style.display = 'none';
-};
-
-const selectOnlyThis = (checkbox) => {
-  const checkboxes = document.querySelectorAll('input[name="operationModel"]');
-  checkboxes.forEach((item) => {
-    if (item !== checkbox) item.checked = false;
-  });
+const initializeSections = (formContainer) => {
+  const imageFiles = attachImageUploadHandler(formContainer);
+  attachSocialMediaHandlers(formContainer);
+  attachLogoUploadHandler(formContainer);
+  attachCoordinatesHandler(formContainer);
+  return imageFiles;
 };
 
 export const getBusinessForm = () => {
@@ -151,21 +107,20 @@ export const getBusinessForm = () => {
       ${renderImageUploadSection()}
       ${renderDescriptionSection('initial')}
     </form>
-    <form class="additional-sections"> <!-- Start the new form here -->
-      <div class="form-section additional-info-container">
-        <label for="additionalDropdown">Additional Information</label>
-        <select id="additionalDropdown" name="additionalDropdown">
-          <option value="" disabled selected>Select a Category to Add to Continue</option>
-        </select>
-        <button type="button" id="addSectionButton">Add</button>
-      </div>
-    </form>
+    <div class="additional-sections-container">
+      <form class="additional-sections">
+        <div class="form-section additional-info-container">
+          <label for="additionalDropdown">Additional Information</label>
+          <select id="additionalDropdown" name="additionalDropdown">
+            <option value="" disabled selected>Select a Category to Add to Continue</option>
+          </select>
+          <button type="button" id="addSectionButton">Add</button>
+        </div>
+      </form>
+    </div>
   `;
 
-  const imageFiles = attachImageUploadHandler(formContainer);
-  attachSocialMediaHandlers(formContainer);
-  attachLogoUploadHandler(formContainer);
-  attachCoordinatesHandler(formContainer);
+  const imageFiles = initializeSections(formContainer);
 
   setTimeout(() => {
     initializeTinyMCE('#description-initial');
@@ -175,11 +130,13 @@ export const getBusinessForm = () => {
   const form = formContainer.querySelector('#business-form');
   form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
 
-  // Add event listener for the add button
+  let firstAddonAdded = false;
   const addSectionButton = formContainer.querySelector('#addSectionButton');
-  addSectionButton.addEventListener('click', addAdditionalSection);
+  addSectionButton.addEventListener('click', () => {
+    addAdditionalSection(firstAddonAdded);
+    firstAddonAdded = true; // Mark that the first addon has been added
+  });
 
-  // Add event listeners for the operation model checkboxes
   const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
   operationModelCheckboxes.forEach((checkbox) => {
     checkbox.addEventListener('click', () => selectOnlyThis(checkbox));
