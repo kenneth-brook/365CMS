@@ -19,7 +19,7 @@ const getMenuTypes = async () => {
   export const renderMenuSelectionSection = () => {
     return `
       <div class="form-section" id="menu-selection-section">
-        <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+        <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
           <div class="form-group">
             <label for="menuType">Menu Type:</label>
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -53,6 +53,14 @@ const getMenuTypes = async () => {
     const addNewMenuTypeButton = formContainer.querySelector('#add-new-menu-type');
     const newMenuTypeInput = formContainer.querySelector('#newMenuType');
     const menuTypeList = formContainer.querySelector('#menu-type-list');
+  
+    console.log('Attaching handlers:');
+    console.log('menuTypeDropdown:', menuTypeDropdown);
+    console.log('averageCostDropdown:', averageCostDropdown);
+    console.log('addMenuTypeButton:', addMenuTypeButton);
+    console.log('addNewMenuTypeButton:', addNewMenuTypeButton);
+    console.log('newMenuTypeInput:', newMenuTypeInput);
+    console.log('menuTypeList:', menuTypeList);
   
     if (!menuTypeDropdown || !averageCostDropdown || !addMenuTypeButton || !addNewMenuTypeButton || !newMenuTypeInput || !menuTypeList) {
       console.error('One or more elements not found in the form container:', {
@@ -116,15 +124,19 @@ const getMenuTypes = async () => {
   
     // Attach to form submission to include menu type data
     const form = formContainer.querySelector('#business-form');
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
   
-      const menuTypesInput = document.createElement('input');
-      menuTypesInput.type = 'hidden';
-      menuTypesInput.name = 'menuTypes';
-      menuTypesInput.value = JSON.stringify(menuTypes);
-      form.appendChild(menuTypesInput);
-    });
+        const menuTypesInput = document.createElement('input');
+        menuTypesInput.type = 'hidden';
+        menuTypesInput.name = 'menuTypes';
+        menuTypesInput.value = JSON.stringify(menuTypes);
+        form.appendChild(menuTypesInput);
+      });
+    } else {
+      console.error('Form not found in the form container');
+    }
   
     // Helper function to create list items with a remove button
     function createMenuListItem(name, id) {

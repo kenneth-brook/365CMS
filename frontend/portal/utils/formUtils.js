@@ -62,7 +62,7 @@ export const selectOnlyThis = (checkbox, groupName, callback) => {
     if (item !== checkbox) item.checked = false;
   });
   if (callback) {
-    callback();
+    callback(checkbox);
   }
 };
 
