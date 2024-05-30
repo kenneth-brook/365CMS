@@ -23,28 +23,33 @@ export const renderAdditionalSection = (sectionId) => {
   }
 };*/
 
-
-// renderAddonSection.js
-
 import { renderCommonSections } from './sections/renderCommonSections.js';
-import { renderEatUniqueSection } from './sections/renderEatUniqueSection.js';
+import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/renderEatUniqueSection.js';
 // Import other unique sections as needed
 
-export const renderAddonSection = (sectionId) => {
+export const renderAdditionalSection = (sectionId) => {
   const uniqueId = `description-${Date.now()}`; // Generate a unique ID
 
   let uniqueSectionHtml = '';
+  let attachHandlers = null;
+
   switch (sectionId) {
     case 'eat':
       uniqueSectionHtml = renderEatUniqueSection();
+      attachHandlers = attachEatSectionHandlers;
       break;
     // Add cases for other sections (stay, play, shop, other) as needed
     default:
       uniqueSectionHtml = '';
   }
 
-  return `
+  const sectionHtml = `
     ${uniqueSectionHtml}
     ${renderCommonSections(uniqueId)}
   `;
+
+  return {
+    sectionHtml,
+    attachHandlers,
+  };
 };

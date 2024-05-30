@@ -1,7 +1,25 @@
-export const renderMenuSelectionSection = () => {
+const getMenuTypes = async () => {
+    // Fetch menu types from your API
+    return [
+      { id: 1, name: 'Breakfast' },
+      { id: 2, name: 'Lunch' },
+      { id: 3, name: 'Dinner' }
+    ];
+  };
+  
+  const getAverageCosts = async () => {
+    // Fetch average costs from your API
+    return [
+      { id: 1, name: '$' },
+      { id: 2, name: '$$' },
+      { id: 3, name: '$$$' }
+    ];
+  };
+  
+  export const renderMenuSelectionSection = () => {
     return `
-      <div class="form-section" id="menu-selection-section" style="width: 100%;">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
+      <div class="form-section" id="menu-selection-section">
+        <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
           <div class="form-group">
             <label for="menuType">Menu Type:</label>
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -28,7 +46,7 @@ export const renderMenuSelectionSection = () => {
     `;
   };
   
-  export const attachMenuSelectionHandlers = (formContainer) => {
+  export const attachMenuSelectionHandlers = async (formContainer) => {
     const menuTypeDropdown = formContainer.querySelector('#menuType');
     const averageCostDropdown = formContainer.querySelector('#averageCost');
     const addMenuTypeButton = formContainer.querySelector('#add-menu-type');
@@ -36,25 +54,35 @@ export const renderMenuSelectionSection = () => {
     const newMenuTypeInput = formContainer.querySelector('#newMenuType');
     const menuTypeList = formContainer.querySelector('#menu-type-list');
   
+    if (!menuTypeDropdown || !averageCostDropdown || !addMenuTypeButton || !addNewMenuTypeButton || !newMenuTypeInput || !menuTypeList) {
+      console.error('One or more elements not found in the form container:', {
+        menuTypeDropdown,
+        averageCostDropdown,
+        addMenuTypeButton,
+        addNewMenuTypeButton,
+        newMenuTypeInput,
+        menuTypeList
+      });
+      return;
+    }
+  
     const menuTypes = [];
     
     // Fetch initial data
-    getMenuTypes().then(menuTypes => {
-      menuTypes.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.id;
-        option.textContent = type.name;
-        menuTypeDropdown.appendChild(option);
-      });
+    const fetchedMenuTypes = await getMenuTypes();
+    fetchedMenuTypes.forEach(type => {
+      const option = document.createElement('option');
+      option.value = type.id;
+      option.textContent = type.name;
+      menuTypeDropdown.appendChild(option);
     });
   
-    getAverageCosts().then(costs => {
-      costs.forEach(cost => {
-        const option = document.createElement('option');
-        option.value = cost.id;
-        option.textContent = cost.name;
-        averageCostDropdown.appendChild(option);
-      });
+    const fetchedAverageCosts = await getAverageCosts();
+    fetchedAverageCosts.forEach(cost => {
+      const option = document.createElement('option');
+      option.value = cost.id;
+      option.textContent = cost.name;
+      averageCostDropdown.appendChild(option);
     });
   
     // Add existing menu type selection
