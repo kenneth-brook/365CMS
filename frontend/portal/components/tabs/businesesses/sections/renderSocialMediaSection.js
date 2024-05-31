@@ -19,11 +19,21 @@ export const attachSocialMediaHandlers = (formContainer) => {
   const addButton = formContainer.querySelector('#add-social-media');
   const socialMediaList = formContainer.querySelector('#social-media-list');
 
+  if (!addButton || !socialMediaList) {
+    console.error('One or more elements not found for Social Media handlers');
+    return;
+  }
+
   const socialMediaPairs = [];
 
   addButton.addEventListener('click', () => {
     const platformInput = formContainer.querySelector('#socialPlatform');
     const addressInput = formContainer.querySelector('#socialAddress');
+
+    if (!platformInput || !addressInput) {
+      console.error('Social media inputs not found');
+      return;
+    }
 
     const platform = platformInput.value.trim();
     const address = addressInput.value.trim();
@@ -42,14 +52,20 @@ export const attachSocialMediaHandlers = (formContainer) => {
 
   // Attach to form submission to include social media data
   const form = formContainer.querySelector('#business-form');
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
+  if (form) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
 
-    // Store social media pairs in a hidden input field
-    const socialMediaInput = document.createElement('input');
-    socialMediaInput.type = 'hidden';
-    socialMediaInput.name = 'socialMedia';
-    socialMediaInput.value = JSON.stringify(socialMediaPairs);
-    form.appendChild(socialMediaInput);
-  });
+      // Store social media pairs in a hidden input field
+      const socialMediaInput = document.createElement('input');
+      socialMediaInput.type = 'hidden';
+      socialMediaInput.name = 'socialMedia';
+      socialMediaInput.value = JSON.stringify(socialMediaPairs);
+      form.appendChild(socialMediaInput);
+
+      form.submit(); // Submit the form after appending the hidden input
+    });
+  } else {
+    console.error('Form not found in the form container');
+  }
 };

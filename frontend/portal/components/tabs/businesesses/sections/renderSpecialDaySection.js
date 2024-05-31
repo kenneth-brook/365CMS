@@ -23,6 +23,11 @@ export const renderSpecialDaySection = (id) => {
     const hoursInput = document.getElementById(`altered-hours-${id}`);
     const listContainer = document.getElementById(`day-hours-list-${id}`);
   
+    if (!addButton || !dayInput || !hoursInput || !listContainer) {
+      console.error('One or more elements not found for Special Day handlers');
+      return;
+    }
+  
     addButton.addEventListener('click', () => {
       const day = dayInput.value.trim();
       const hours = hoursInput.value.trim();
@@ -41,4 +46,5 @@ export const renderSpecialDaySection = (id) => {
       }
     });
   };
+  
   

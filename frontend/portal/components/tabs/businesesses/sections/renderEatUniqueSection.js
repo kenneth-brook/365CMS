@@ -72,6 +72,11 @@ export const renderEatUniqueSection = () => {
 };
 
 export const attachEatSectionHandlers = async (formContainer) => {
+  if (!formContainer) {
+    console.error('Form container not found for attaching Eat Section handlers');
+    return;
+  }
+
   const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
   const menuStyleCheckboxes = formContainer.querySelectorAll('input[name="menuStyle"]');
 

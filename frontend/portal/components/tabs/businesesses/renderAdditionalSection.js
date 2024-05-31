@@ -1,7 +1,6 @@
 import { renderCommonSections, attachCommonHandlers } from './sections/renderCommonSections.js';
 import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/renderEatUniqueSection.js';
 // Import other unique sections as needed
-import { attachSpecialDayHandlers } from './sections/renderSpecialDaySection.js';
 
 export const renderAdditionalSection = (sectionId) => {
   const uniqueId = `description-${Date.now()}`; // Generate a unique ID
@@ -27,6 +26,7 @@ export const renderAdditionalSection = (sectionId) => {
     case 'other':
       uniqueSectionHtml = '';
       break;
+    // Add cases for other sections (stay, play, shop, other) as needed
     default:
       uniqueSectionHtml = '';
   }
@@ -37,10 +37,15 @@ export const renderAdditionalSection = (sectionId) => {
   `;
 
   const attachAllHandlers = () => {
-    if (attachHandlers) {
-      attachHandlers();
+    const formContainer = document.querySelector('#your-form-container');
+    if (formContainer) {
+      if (attachHandlers) {
+        attachHandlers(formContainer);
+      }
+      attachCommonHandlers(formContainer, uniqueId, dayHoursArray);
+    } else {
+      console.error('Form container not found');
     }
-    attachCommonHandlers(uniqueId, dayHoursArray);
   };
 
   return {

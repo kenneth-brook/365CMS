@@ -22,10 +22,14 @@ export const renderCommonSections = (uniqueId) => {
   `;
 };
 
-export const attachCommonHandlers = (uniqueId, dayHoursArray) => {
-  attachSocialMediaHandlers();
-  attachLogoUploadHandler();
-  attachImageUploadHandler();
-  attachSpecialDayHandlers(uniqueId, dayHoursArray);
-  initializeTinyMCE('.description');
+export const attachCommonHandlers = (formContainer, uniqueId, dayHoursArray) => {
+  if (formContainer) {
+    attachSocialMediaHandlers(formContainer);
+    attachLogoUploadHandler(formContainer);
+    attachImageUploadHandler(formContainer);
+    attachSpecialDayHandlers(uniqueId, dayHoursArray);
+    initializeTinyMCE('.description');
+  } else {
+    console.error('Form container not found');
+  }
 };
