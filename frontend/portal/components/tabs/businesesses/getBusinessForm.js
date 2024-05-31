@@ -137,10 +137,5 @@ export const getBusinessForm = () => {
     firstAddonAdded = true; // Mark that the first addon has been added
   });
 
-  const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
-  operationModelCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener('click', () => selectOnlyThis(checkbox));
-  });
-
   return formContainer;
 };

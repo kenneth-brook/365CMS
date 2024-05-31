@@ -37,8 +37,9 @@ export const renderAdditionalSection = (sectionId) => {
   `;
 
   const attachAllHandlers = () => {
-    const formContainer = document.querySelector('#your-form-container');
+    const formContainer = document.querySelector('.additional-sections');
     if (formContainer) {
+      console.log('Attaching all handlers...');
       if (attachHandlers) {
         attachHandlers(formContainer);
       }
