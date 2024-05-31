@@ -130,62 +130,61 @@ const showMenuSelection = (checkbox) => {
 };
 
 window.updateTable = function() {
-    const operationModel = document.querySelector('input[name="operationModel"]:checked');
-    const menuStyle = document.querySelector('input[name="menuStyle"]:checked');
-    const daysOpen = Array.from(document.querySelectorAll('input[name="daysOpen"]:checked')).map(cb => cb.value);
-    const menuTypes = Array.from(document.querySelectorAll('input[name="menuType"]:checked')).map(cb => cb.value);
+  const operationModel = document.querySelector('input[name="operationModel"]:checked');
+  const menuStyle = document.querySelector('input[name="menuStyle"]:checked');
+  const daysOpen = Array.from(document.querySelectorAll('input[name="daysOpen"]:checked')).map(cb => cb.value);
+  const menuTypes = Array.from(document.querySelectorAll('input[name="menuType"]:checked')).map(cb => cb.value);
 
-    const tableContainer = document.getElementById('scheduleTableContainer');
-    const tableHeader = document.getElementById('scheduleTableHeader');
-    const tableBody = document.querySelector('#scheduleTable tbody');
-    tableBody.innerHTML = ''; // Clear existing table rows
+  const tableContainer = document.getElementById('scheduleTableContainer');
+  const tableHeader = document.getElementById('scheduleTableHeader');
+  const tableBody = document.querySelector('#scheduleTable tbody');
+  tableBody.innerHTML = ''; // Clear existing table rows
 
-    if (!operationModel || !menuStyle || (menuStyle.value === 'MultipleMenus' && menuTypes.length === 0)) {
-      tableContainer.style.display = 'none';
-      return;
-    }
+  if (!operationModel || !menuStyle || (menuStyle.value === 'MultipleMenus' && menuTypes.length === 0)) {
+    tableContainer.style.display = 'none';
+    return;
+  }
 
-    tableContainer.style.display = 'block';
+  tableContainer.style.display = 'block';
 
-    const days = operationModel.value === '7Days/SelectHours' ? ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'] : daysOpen;
+  const days = operationModel.value === '7Days/SelectHours' ? ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'] : daysOpen;
 
-    // Create table header
-    tableHeader.innerHTML = '<th>Day/Menu</th>';
-    if (menuStyle.value === 'MultipleMenus') {
-      menuTypes.forEach(menu => {
-        const th = document.createElement('th');
-        th.textContent = menu;
-        tableHeader.appendChild(th);
-      });
-    } else {
+  // Create table header
+  tableHeader.innerHTML = '<th>Day/Menu</th>';
+  if (menuStyle.value === 'MultipleMenus') {
+    menuTypes.forEach(menu => {
       const th = document.createElement('th');
-      th.textContent = 'Hours Open';
+      th.textContent = menu;
       tableHeader.appendChild(th);
-    }
+    });
+  } else {
+    const th = document.createElement('th');
+    th.textContent = 'Hours Open';
+    tableHeader.appendChild(th);
+  }
 
-    // Create table rows
-    days.forEach(day => {
-      const row = document.createElement('tr');
-      const dayCell = document.createElement('td');
-      dayCell.textContent = day;
-      row.appendChild(dayCell);
+  // Create table rows
+  days.forEach(day => {
+    const row = document.createElement('tr');
+    const dayCell = document.createElement('td');
+    dayCell.textContent = day;
+    row.appendChild(dayCell);
 
-      if (menuStyle.value === 'MultipleMenus') {
-        menuTypes.forEach(() => {
-          const inputCell = document.createElement('td');
-          inputCell.innerHTML = '<input type="text" name="hoursOpen">';
-          row.appendChild(inputCell);
-        });
-      } else {
+    if (menuStyle.value === 'MultipleMenus') {
+      menuTypes.forEach(() => {
         const inputCell = document.createElement('td');
         inputCell.innerHTML = '<input type="text" name="hoursOpen">';
         row.appendChild(inputCell);
-      }
+      });
+    } else {
+      const inputCell = document.createElement('td');
+      inputCell.innerHTML = '<input type="text" name="hoursOpen">';
+      row.appendChild(inputCell);
+    }
 
-      tableBody.appendChild(row);
-    });
-  };
-
+    tableBody.appendChild(row);
+  });
+};
 
 // Expose these functions to the global scope if needed
 window.showDaySelection = showDaySelection;

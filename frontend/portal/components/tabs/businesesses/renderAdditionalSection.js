@@ -1,34 +1,11 @@
-// /components/tabs/businesses/sections/renderAdditionalSection.js
-
-/*import { renderEatSection } from './sections/renderEatSection.js';
-import { renderStaySection } from './sections/renderStaySection.js';
-import { renderPlaySection } from './sections/renderPlaySection.js';
-import { renderShopSection } from './sections/renderShopSection.js';
-import { renderOtherSection } from './sections/renderOtherSection.js';
-
-export const renderAdditionalSection = (sectionId) => {
-  switch (sectionId) {
-    case 'eat':
-      return renderEatSection();
-    case 'stay':
-      return renderStaySection();
-    case 'play':
-      return renderPlaySection();
-    case 'shop':
-      return renderShopSection();
-    case 'other':
-      return renderOtherSection();
-    default:
-      return '';
-  }
-};*/
-
-import { renderCommonSections } from './sections/renderCommonSections.js';
+import { renderCommonSections, attachCommonHandlers } from './sections/renderCommonSections.js';
 import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/renderEatUniqueSection.js';
 // Import other unique sections as needed
+import { attachSpecialDayHandlers } from './sections/renderSpecialDaySection.js';
 
 export const renderAdditionalSection = (sectionId) => {
   const uniqueId = `description-${Date.now()}`; // Generate a unique ID
+  const dayHoursArray = []; // Array to store the day and hours pairs
 
   let uniqueSectionHtml = '';
   let attachHandlers = null;
@@ -38,7 +15,18 @@ export const renderAdditionalSection = (sectionId) => {
       uniqueSectionHtml = renderEatUniqueSection();
       attachHandlers = attachEatSectionHandlers;
       break;
-    // Add cases for other sections (stay, play, shop, other) as needed
+    case 'stay':
+      uniqueSectionHtml = '';
+      break;
+    case 'play':
+      uniqueSectionHtml = '';
+      break;
+    case 'shop':
+      uniqueSectionHtml = '';
+      break;
+    case 'other':
+      uniqueSectionHtml = '';
+      break;
     default:
       uniqueSectionHtml = '';
   }
@@ -48,8 +36,16 @@ export const renderAdditionalSection = (sectionId) => {
     ${renderCommonSections(uniqueId)}
   `;
 
+  const attachAllHandlers = () => {
+    if (attachHandlers) {
+      attachHandlers();
+    }
+    attachCommonHandlers(uniqueId, dayHoursArray);
+  };
+
   return {
     sectionHtml,
-    attachHandlers,
+    attachHandlers: attachAllHandlers,
+    dayHoursArray, // Return the array for database storage
   };
 };
