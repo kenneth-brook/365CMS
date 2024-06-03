@@ -88,16 +88,6 @@ const initializeSections = (formContainer, uniqueId) => {
   return imageFiles;
 };
 
-const ensureElementExists = (selector, callback) => {
-  const checkInterval = setInterval(() => {
-    const element = document.querySelector(selector);
-    if (element) {
-      clearInterval(checkInterval);
-      callback();
-    }
-  }, 100);
-};
-
 export const getBusinessForm = () => {
   const formContainer = document.createElement('div');
   formContainer.id = 'form-container';
@@ -133,11 +123,11 @@ export const getBusinessForm = () => {
 
   const imageFiles = initializeSections(formContainer, uniqueId);
 
-  const descriptionSelector = `#description-${uniqueId}`;
-  ensureElementExists(descriptionSelector, () => {
-    initializeTinyMCE(descriptionSelector);
+  setTimeout(() => {
+    initializeTinyMCE(`#description-${uniqueId}`);
+    console.log(`#description-${uniqueId}`)
     fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
-  });
+  }, 0);
 
   const form = formContainer.querySelector(`#business-form-${uniqueId}`);
   form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
