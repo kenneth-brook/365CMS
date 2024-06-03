@@ -10,12 +10,16 @@ export const renderDescriptionSection = (id) => {
 };
 
 export const initializeTinyMCE = (selector) => {
+  console.log('Attempting to initialize TinyMCE for', selector);
   tinymce.init({
     selector: selector,
     license_key: 'gpl',
     plugins: 'link code',
     toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code',
+    setup: (editor) => {
+      editor.on('init', () => {
+        console.log(`TinyMCE initialized for ${selector}`);
+      });
+    }
   });
 };
-
-  

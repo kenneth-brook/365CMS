@@ -2,8 +2,7 @@ import { renderCommonSections, attachCommonHandlers } from './sections/renderCom
 import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/renderEatUniqueSection.js';
 // Import other unique sections as needed
 
-export const renderAdditionalSection = (sectionId) => {
-  const uniqueId = `description-${Date.now()}`; // Generate a unique ID
+export const renderAdditionalSection = (sectionId, uniqueId) => {
   const dayHoursArray = []; // Array to store the day and hours pairs
 
   let uniqueSectionHtml = '';
@@ -11,41 +10,61 @@ export const renderAdditionalSection = (sectionId) => {
 
   switch (sectionId) {
     case 'eat':
-      uniqueSectionHtml = renderEatUniqueSection();
+      uniqueSectionHtml = renderEatUniqueSection(uniqueId); // Pass uniqueId
       attachHandlers = attachEatSectionHandlers;
       break;
     case 'stay':
-      uniqueSectionHtml = '';
+      uniqueSectionHtml = ''; // Implement as needed
       break;
     case 'play':
-      uniqueSectionHtml = '';
+      uniqueSectionHtml = ''; // Implement as needed
       break;
     case 'shop':
-      uniqueSectionHtml = '';
+      uniqueSectionHtml = ''; // Implement as needed
       break;
     case 'other':
-      uniqueSectionHtml = '';
+      uniqueSectionHtml = ''; // Implement as needed
       break;
-    // Add cases for other sections (stay, play, shop, other) as needed
     default:
       uniqueSectionHtml = '';
   }
 
   const sectionHtml = `
     ${uniqueSectionHtml}
-    ${renderCommonSections(uniqueId)}
+    ${renderCommonSections(uniqueId)} <!-- Pass uniqueId -->
   `;
 
-  const attachAllHandlers = () => {
-    const formContainer = document.querySelector('.additional-sections');
-    if (formContainer) {
+  const waitForElement = (selector, timeout = 5000) => {
+    return new Promise((resolve, reject) => {
+      const intervalTime = 100;
+      let timeElapsed = 0;
+
+      const interval = setInterval(() => {
+        const element = document.querySelector(selector);
+        if (element) {
+          clearInterval(interval);
+          resolve(element);
+        } else {
+          timeElapsed += intervalTime;
+          if (timeElapsed >= timeout) {
+            clearInterval(interval);
+            reject(new Error(`Element with selector "${selector}" not found within ${timeout}ms`));
+          }
+        }
+      }, intervalTime);
+    });
+  };
+
+  const attachAllHandlers = async () => {
+    try {
+      const formContainer = await waitForElement(`.additional-section[data-id="${uniqueId}"]`);
       console.log('Attaching all handlers...');
       if (attachHandlers) {
-        attachHandlers(formContainer);
+        attachHandlers(formContainer, uniqueId); // Pass uniqueId
       }
       attachCommonHandlers(formContainer, uniqueId, dayHoursArray);
-    } else {
-      console.error('Form container not found');
+    } catch (error) {
+      console.error(error.message);
     }
   };
 

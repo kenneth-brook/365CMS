@@ -1,23 +1,23 @@
-export const renderSocialMediaSection = () => {
+export const renderSocialMediaSection = (index) => {
   return `
-    <div class="form-section" id="social-media-section">
+    <div class="form-section" id="social-media-section-${index}">
       <div class="form-group">
-        <label for="socialPlatform">Social Platform:</label>
-        <input type="text" id="socialPlatform" name="socialPlatform">
+        <label for="socialPlatform-${index}">Social Platform:</label>
+        <input type="text" id="socialPlatform-${index}" name="socialPlatform-${index}">
       </div>
       <div class="form-group">
-        <label for="socialAddress">Social Address:</label>
-        <input type="text" id="socialAddress" name="socialAddress">
+        <label for="socialAddress-${index}">Social Address:</label>
+        <input type="text" id="socialAddress-${index}" name="socialAddress-${index}">
       </div>
-      <button type="button" id="add-social-media">Add</button>
-      <ul id="social-media-list"></ul>
+      <button type="button" id="add-social-media-${index}">Add</button>
+      <ul id="social-media-list-${index}"></ul>
     </div>
   `;
 };
 
-export const attachSocialMediaHandlers = (formContainer) => {
-  const addButton = formContainer.querySelector('#add-social-media');
-  const socialMediaList = formContainer.querySelector('#social-media-list');
+export const attachSocialMediaHandlers = (formContainer, index) => {
+  const addButton = formContainer.querySelector(`#add-social-media-${index}`);
+  const socialMediaList = formContainer.querySelector(`#social-media-list-${index}`);
 
   if (!addButton || !socialMediaList) {
     console.error('One or more elements not found for Social Media handlers');
@@ -27,8 +27,8 @@ export const attachSocialMediaHandlers = (formContainer) => {
   const socialMediaPairs = [];
 
   addButton.addEventListener('click', () => {
-    const platformInput = formContainer.querySelector('#socialPlatform');
-    const addressInput = formContainer.querySelector('#socialAddress');
+    const platformInput = formContainer.querySelector(`#socialPlatform-${index}`);
+    const addressInput = formContainer.querySelector(`#socialAddress-${index}`);
 
     if (!platformInput || !addressInput) {
       console.error('Social media inputs not found');
@@ -50,22 +50,6 @@ export const attachSocialMediaHandlers = (formContainer) => {
     }
   });
 
-  // Attach to form submission to include social media data
-  const form = formContainer.querySelector('#business-form');
-  if (form) {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-
-      // Store social media pairs in a hidden input field
-      const socialMediaInput = document.createElement('input');
-      socialMediaInput.type = 'hidden';
-      socialMediaInput.name = 'socialMedia';
-      socialMediaInput.value = JSON.stringify(socialMediaPairs);
-      form.appendChild(socialMediaInput);
-
-      form.submit(); // Submit the form after appending the hidden input
-    });
-  } else {
-    console.error('Form not found in the form container');
-  }
+  // Store the social media pairs in the form container for later retrieval
+  formContainer.socialMediaPairs = socialMediaPairs;
 };

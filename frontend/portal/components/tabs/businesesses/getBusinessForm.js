@@ -6,7 +6,7 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './sections/
 import { renderLogoUploadSection, attachLogoUploadHandler } from './sections/renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './sections/renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDescriptionSection.js';
-import { fetchAdditionalOptions, addAdditionalSection, selectOnlyThis } from '../../../utils/formUtils.js';
+import { fetchAdditionalOptions, addAdditionalSection, selectOnlyThis, getUniqueId } from '../../../utils/formUtils.js';
 
 const apiService = new ApiService();
 
@@ -80,60 +80,73 @@ const handleFormSubmission = async (event, imageFiles) => {
   }
 };
 
-const initializeSections = (formContainer) => {
+const initializeSections = (formContainer, uniqueId) => {
   const imageFiles = attachImageUploadHandler(formContainer);
-  attachSocialMediaHandlers(formContainer);
+  attachSocialMediaHandlers(formContainer, uniqueId);
   attachLogoUploadHandler(formContainer);
   attachCoordinatesHandler(formContainer);
   return imageFiles;
 };
 
+const ensureElementExists = (selector, callback) => {
+  const checkInterval = setInterval(() => {
+    const element = document.querySelector(selector);
+    if (element) {
+      clearInterval(checkInterval);
+      callback();
+    }
+  }, 100);
+};
+
 export const getBusinessForm = () => {
   const formContainer = document.createElement('div');
   formContainer.id = 'form-container';
+  const uniqueId = getUniqueId('business-form');
   formContainer.innerHTML = `
-    <form id="business-form" enctype="multipart/form-data">
+    <form id="business-form-${uniqueId}" enctype="multipart/form-data">
       <div class="form-section">
         <div class="form-toggle">
           <label id="toggle-label">Company is currently <span id="toggle-status" style="color: red;">Inactive</span></label>
           <input type="checkbox" id="active-toggle" name="active">
         </div>
       </div>
-      ${renderAddressSection()}
-      ${renderCoordinatesSection()}
-      ${renderContactSection()}
-      ${renderSocialMediaSection()}
-      ${renderLogoUploadSection()}
-      ${renderImageUploadSection()}
-      ${renderDescriptionSection('initial')}
+      ${renderAddressSection(uniqueId)}
+      ${renderCoordinatesSection(uniqueId)}
+      ${renderContactSection(uniqueId)}
+      ${renderSocialMediaSection(uniqueId)}
+      ${renderLogoUploadSection(uniqueId)}
+      ${renderImageUploadSection(uniqueId)}
+      ${renderDescriptionSection(`description-${uniqueId}`)}
     </form>
-    <div class="additional-sections-container">
+    <div class="additional-sections-container" data-id="${uniqueId}">
       <form class="additional-sections">
         <div class="form-section additional-info-container">
           <label for="additionalDropdown">Additional Information</label>
           <select id="additionalDropdown" name="additionalDropdown">
             <option value="" disabled selected>Select a Category to Add to Continue</option>
           </select>
-          <button type="button" id="addSectionButton">Add</button>
+          <button type="button" id="addSectionButton-${uniqueId}">Add</button>
         </div>
       </form>
     </div>
   `;
 
-  const imageFiles = initializeSections(formContainer);
+  const imageFiles = initializeSections(formContainer, uniqueId);
 
-  setTimeout(() => {
-    initializeTinyMCE('#description-initial');
+  const descriptionSelector = `#description-${uniqueId}`;
+  ensureElementExists(descriptionSelector, () => {
+    initializeTinyMCE(descriptionSelector);
     fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
-  }, 0);
+  });
 
-  const form = formContainer.querySelector('#business-form');
+  const form = formContainer.querySelector(`#business-form-${uniqueId}`);
   form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
 
   let firstAddonAdded = false;
-  const addSectionButton = formContainer.querySelector('#addSectionButton');
+  const addSectionButton = formContainer.querySelector(`#addSectionButton-${uniqueId}`);
   addSectionButton.addEventListener('click', () => {
-    addAdditionalSection(firstAddonAdded);
+    const newSectionId = getUniqueId('section');
+    addAdditionalSection(firstAddonAdded, newSectionId);
     firstAddonAdded = true; // Mark that the first addon has been added
   });
 

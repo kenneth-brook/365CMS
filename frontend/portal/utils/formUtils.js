@@ -23,17 +23,22 @@ export const fetchAdditionalOptions = async () => {
   }
 };
 
-export const addAdditionalSection = (firstAddonAdded) => {
+export const getUniqueId = (prefix) => {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
+export const addAdditionalSection = (firstAddonAdded, uniqueId) => {
   const dropdown = document.getElementById('additionalDropdown');
   const selectedValue = dropdown.value;
   const selectedText = dropdown.options[dropdown.selectedIndex].text;
   const additionalSectionsContainer = document.querySelector('.additional-sections-container');
   const additionalInfoContainer = document.querySelector('.additional-info-container');
 
-  const { sectionHtml, attachHandlers } = renderAdditionalSection(selectedValue);
+  const { sectionHtml, attachHandlers } = renderAdditionalSection(selectedValue, uniqueId);
 
   const newForm = document.createElement('form');
   newForm.className = 'additional-section';
+  newForm.setAttribute('data-id', uniqueId);
   newForm.innerHTML = `
     <div class="form-section">
       <h3>Business Category: ${selectedText}</h3>
@@ -48,7 +53,7 @@ export const addAdditionalSection = (firstAddonAdded) => {
   additionalSectionsContainer.appendChild(additionalInfoContainer);
 
   if (attachHandlers) {
-    attachHandlers(newForm);
+    attachHandlers(); // Attach handlers now that the section is in the DOM
   }
 
   if (!firstAddonAdded) {
