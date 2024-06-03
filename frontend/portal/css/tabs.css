@@ -308,3 +308,8 @@ form button:hover {
     padding: 8px 16px;
     cursor: pointer;
 }
+
+.hours-table {
+    width: 50%;
+    margin: 0 auto;
+}

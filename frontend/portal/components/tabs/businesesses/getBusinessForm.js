@@ -125,7 +125,6 @@ export const getBusinessForm = () => {
 
   setTimeout(() => {
     initializeTinyMCE(`#description-${uniqueId}`);
-    console.log(`#description-${uniqueId}`)
     fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
   }, 0);
 
