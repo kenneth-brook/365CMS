@@ -1,6 +1,13 @@
 import { renderMenuSelectionSection, attachMenuSelectionHandlers } from './renderMenuSelectionSection.js';
 
 export const renderEatUniqueSection = () => {
+  const labels = {
+    menuTypeLabel: 'Menu Type',
+    newMenuTypeLabel: 'Add New Selection',
+    averageCostLabel: 'Average Cost',
+    showAverageCost: true
+  };
+
   return `
     <div class="form-section">
       <div style="width: 100%" class="form-message">
@@ -67,7 +74,7 @@ export const renderEatUniqueSection = () => {
         </div>
       </div>
     </div>
-    ${renderMenuSelectionSection()}
+    ${renderMenuSelectionSection('eat', labels)}
   `;
 };
 
@@ -79,10 +86,6 @@ export const attachEatSectionHandlers = async (formContainer) => {
 
   const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
   const menuStyleCheckboxes = formContainer.querySelectorAll('input[name="menuStyle"]');
-
-  console.log('Attaching handlers for Eat Section:');
-  console.log('operationModelCheckboxes:', operationModelCheckboxes);
-  console.log('menuStyleCheckboxes:', menuStyleCheckboxes);
 
   if (operationModelCheckboxes.length > 0) {
     operationModelCheckboxes.forEach((checkbox) => {
@@ -101,13 +104,12 @@ export const attachEatSectionHandlers = async (formContainer) => {
   }
 
   // Call attachMenuSelectionHandlers for the menu selection section
-  await attachMenuSelectionHandlers(formContainer);
+  await attachMenuSelectionHandlers(formContainer, 'eat');
 };
 
 const showDaySelection = (checkbox) => {
   const container = checkbox.closest('.form-group-container');
   const daySelectionContainer = container.querySelector('#daySelectionContainer');
-  console.log('showDaySelection:', daySelectionContainer);
   if (daySelectionContainer) {
     if (checkbox.value !== '24/7') {
       daySelectionContainer.style.display = 'block';
@@ -122,7 +124,6 @@ const showDaySelection = (checkbox) => {
 const showMenuSelection = (checkbox) => {
   const container = checkbox.closest('.form-group-container');
   const menuSelectionContainer = container.querySelector('#menuSelectionContainer');
-  console.log('showMenuSelection:', menuSelectionContainer);
   if (menuSelectionContainer) {
     if (checkbox.value === 'MultipleMenus') {
       menuSelectionContainer.style.display = 'block';

@@ -1,66 +1,46 @@
-const getMenuTypes = async () => {
-  // Fetch menu types from your API
-  return [
-    { id: 1, name: 'Breakfast' },
-    { id: 2, name: 'Lunch' },
-    { id: 3, name: 'Dinner' }
-  ];
-};
+import { getMenuTypes, getAverageCosts, addNewMenuType } from '../../../../utils/formUtils.js';
 
-const getAverageCosts = async () => {
-  // Fetch average costs from your API
-  return [
-    { id: 1, name: '$' },
-    { id: 2, name: '$$' },
-    { id: 3, name: '$$$' }
-  ];
-};
-
-const addNewMenuType = async (newMenuType) => {
-  // Add new menu type to your API and return the new type
-  // This is a mock function, replace it with your actual API call
-  return { id: Date.now(), name: newMenuType };
-};
-
-export const renderMenuSelectionSection = () => {
+export const renderMenuSelectionSection = (section, labels) => {
   return `
-    <div class="form-section" id="menu-selection-section">
+    <div class="form-section" id="menu-selection-section-${section}">
       <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
         <div class="form-group">
-          <label for="menuType">Menu Type:</label>
+          <label for="menuType-${section}">${labels.menuTypeLabel}:</label>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <select id="menuType" name="menuType"></select>
-            <button type="button" id="add-menu-type">Add Selection</button>
+            <select id="menuType-${section}" name="menuType-${section}"></select>
+            <button type="button" id="add-menu-type-${section}">Add Selection</button>
           </div>
         </div>
         <div class="form-group">
-          <label for="newMenuType">Add New Selection:</label>
+          <label for="newMenuType-${section}">${labels.newMenuTypeLabel}:</label>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="text" id="newMenuType" name="newMenuType">
-            <button type="button" id="add-new-menu-type">Add</button>
+            <input type="text" id="newMenuType-${section}" name="newMenuType-${section}">
+            <button type="button" id="add-new-menu-type-${section}">Add</button>
           </div>
         </div>
+        ${labels.showAverageCost ? `
         <div class="form-group">
-          <label for="averageCost">Average Cost:</label>
+          <label for="averageCost-${section}">${labels.averageCostLabel}:</label>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <select id="averageCost" name="averageCost"></select>
+            <select id="averageCost-${section}" name="averageCost-${section}"></select>
           </div>
         </div>
+        ` : ''}
       </div>
-      <ul id="menu-type-list"></ul>
+      <ul id="menu-type-list-${section}"></ul>
     </div>
   `;
 };
 
-export const attachMenuSelectionHandlers = async (formContainer) => {
-  const menuTypeDropdown = formContainer.querySelector('#menuType');
-  const averageCostDropdown = formContainer.querySelector('#averageCost');
-  const addMenuTypeButton = formContainer.querySelector('#add-menu-type');
-  const addNewMenuTypeButton = formContainer.querySelector('#add-new-menu-type');
-  const newMenuTypeInput = formContainer.querySelector('#newMenuType');
-  const menuTypeList = formContainer.querySelector('#menu-type-list');
+export const attachMenuSelectionHandlers = async (formContainer, section) => {
+  const menuTypeDropdown = formContainer.querySelector(`#menuType-${section}`);
+  const averageCostDropdown = formContainer.querySelector(`#averageCost-${section}`);
+  const addMenuTypeButton = formContainer.querySelector(`#add-menu-type-${section}`);
+  const addNewMenuTypeButton = formContainer.querySelector(`#add-new-menu-type-${section}`);
+  const newMenuTypeInput = formContainer.querySelector(`#newMenuType-${section}`);
+  const menuTypeList = formContainer.querySelector(`#menu-type-list-${section}`);
 
-  if (!menuTypeDropdown || !averageCostDropdown || !addMenuTypeButton || !addNewMenuTypeButton || !newMenuTypeInput || !menuTypeList) {
+  if (!menuTypeDropdown || (!averageCostDropdown && (section === 'eat' || section === 'stay')) || !addMenuTypeButton || !addNewMenuTypeButton || !newMenuTypeInput || !menuTypeList) {
     console.error('One or more elements not found in the form container:', {
       menuTypeDropdown,
       averageCostDropdown,
@@ -75,7 +55,7 @@ export const attachMenuSelectionHandlers = async (formContainer) => {
   const menuTypes = [];
 
   // Fetch initial data
-  const fetchedMenuTypes = await getMenuTypes();
+  const fetchedMenuTypes = await getMenuTypes(section);
   fetchedMenuTypes.forEach(type => {
     const option = document.createElement('option');
     option.value = type.id;
@@ -83,13 +63,15 @@ export const attachMenuSelectionHandlers = async (formContainer) => {
     menuTypeDropdown.appendChild(option);
   });
 
-  const fetchedAverageCosts = await getAverageCosts();
-  fetchedAverageCosts.forEach(cost => {
-    const option = document.createElement('option');
-    option.value = cost.id;
-    option.textContent = cost.name;
-    averageCostDropdown.appendChild(option);
-  });
+  if (section === 'eat' || section === 'stay') {
+    const fetchedAverageCosts = await getAverageCosts(section);
+    fetchedAverageCosts.forEach(cost => {
+      const option = document.createElement('option');
+      option.value = cost.id;
+      option.textContent = cost.name;
+      averageCostDropdown.appendChild(option);
+    });
+  }
 
   // Add existing menu type selection
   addMenuTypeButton.addEventListener('click', () => {
@@ -105,7 +87,7 @@ export const attachMenuSelectionHandlers = async (formContainer) => {
   addNewMenuTypeButton.addEventListener('click', async () => {
     const newMenuType = newMenuTypeInput.value.trim();
     if (newMenuType) {
-      const response = await addNewMenuType(newMenuType);
+      const response = await addNewMenuType(newMenuType, section);
       const option = document.createElement('option');
       option.value = response.id;
       option.textContent = newMenuType;
@@ -120,14 +102,14 @@ export const attachMenuSelectionHandlers = async (formContainer) => {
   });
 
   // Attach to form submission to include menu type data
-  const form = formContainer.querySelector('#business-form');
+  const form = formContainer.querySelector(`#business-form`);
   if (form) {
     form.addEventListener('submit', (event) => {
       event.preventDefault();
 
       const menuTypesInput = document.createElement('input');
       menuTypesInput.type = 'hidden';
-      menuTypesInput.name = 'menuTypes';
+      menuTypesInput.name = `menuTypes-${section}`;
       menuTypesInput.value = JSON.stringify(menuTypes);
       form.appendChild(menuTypesInput);
 

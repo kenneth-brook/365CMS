@@ -23,6 +23,45 @@ export const fetchAdditionalOptions = async () => {
   }
 };
 
+export const getMenuTypes = async (section) => {
+  try {
+    const response = await apiService.fetch(`menu-types?section=${section}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching menu types for section ${section}:`, error);
+    return [];
+  }
+};
+
+export const getAverageCosts = async (section) => {
+  if (section === 'eat' || section === 'stay') {
+    try {
+      const response = await apiService.fetch(`average-costs?section=${section}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching average costs for section ${section}:`, error);
+      return [];
+    }
+  }
+  return [];
+};
+
+export const addNewMenuType = async (newMenuType, section) => {
+  try {
+    const response = await apiService.fetch('menu-types', {
+      method: 'POST',
+      body: JSON.stringify({ name: newMenuType, section }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error adding new menu type for section ${section}:`, error);
+    return { id: Date.now(), name: newMenuType }; // Fallback to a mock response
+  }
+};
+
 export const getUniqueId = (prefix) => {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
