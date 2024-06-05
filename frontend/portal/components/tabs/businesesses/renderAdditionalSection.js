@@ -3,7 +3,7 @@ import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/ren
 import { renderStayUniqueSection, attachStaySectionHandlers } from './sections/renderStayUniqueSection.js';
 import { renderPlayUniqueSection, attachPlaySectionHandlers } from './sections/renderPlayUniqueSection.js';
 import { renderShopUniqueSection, attachShopSectionHandlers } from './sections/renderShopUniqueSection.js';
-import { renderOtherUniqueSection } from './sections/renderOtherUniqueSection.js';
+import { renderOtherUniqueSection, attachOtherSectionHandlers } from './sections/renderOtherUniqueSection.js';
 // Import other unique sections as needed
 
 export const renderAdditionalSection = (sectionId, uniqueId) => {
@@ -31,6 +31,7 @@ export const renderAdditionalSection = (sectionId, uniqueId) => {
       break;
     case 'other':
       uniqueSectionHtml = renderOtherUniqueSection(uniqueId); // Implement as needed
+      attachHandlers = attachOtherSectionHandlers;
       break;
     default:
       uniqueSectionHtml = '';
