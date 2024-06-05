@@ -27,5 +27,3 @@ export const attachPlaySectionHandlers = async (formContainer) => {
   // Add any specific handlers for the hours section if needed
   // Currently, there are no additional handlers for the "play" section
 };
-
-  

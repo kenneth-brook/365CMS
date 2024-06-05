@@ -1,7 +1,7 @@
 import { renderCommonSections, attachCommonHandlers } from './sections/renderCommonSections.js';
 import { renderEatUniqueSection, attachEatSectionHandlers } from './sections/renderEatUniqueSection.js';
 import { renderStayUniqueSection } from './sections/renderStayUniqueSection.js';
-import { renderPlayUniqueSection } from './sections/renderPlayUniqueSection.js';
+import { renderPlayUniqueSection, attachPlaySectionHandlers } from './sections/renderPlayUniqueSection.js';
 import { renderShopUniqueSection, attachShopSectionHandlers } from './sections/renderShopUniqueSection.js';
 import { renderOtherUniqueSection } from './sections/renderOtherUniqueSection.js';
 // Import other unique sections as needed
@@ -22,6 +22,7 @@ export const renderAdditionalSection = (sectionId, uniqueId) => {
       break;
     case 'play':
       uniqueSectionHtml = renderPlayUniqueSection(uniqueId); // Implement as needed
+      attachHandlers = attachPlaySectionHandlers;
       break;
     case 'shop':
       uniqueSectionHtml = renderShopUniqueSection(uniqueId); // Implement as needed
