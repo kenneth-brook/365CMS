@@ -87,6 +87,10 @@ export const attachEatSectionHandlers = async (formContainer) => {
   const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
   const menuStyleCheckboxes = formContainer.querySelectorAll('input[name="menuStyle"]');
 
+  console.log('Attaching handlers for Eat Section:');
+  console.log('operationModelCheckboxes:', operationModelCheckboxes);
+  console.log('menuStyleCheckboxes:', menuStyleCheckboxes);
+
   if (operationModelCheckboxes.length > 0) {
     operationModelCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('click', () => selectOnlyThis(checkbox, 'operationModel', showDaySelection));
@@ -103,13 +107,15 @@ export const attachEatSectionHandlers = async (formContainer) => {
     console.error('Menu style checkboxes not found');
   }
 
-  // Call attachMenuSelectionHandlers for the menu selection section
+  console.log('Calling attachMenuSelectionHandlers for section: eat');
   await attachMenuSelectionHandlers(formContainer, 'eat');
+  console.log('Finished calling attachMenuSelectionHandlers for section: eat');
 };
 
 const showDaySelection = (checkbox) => {
   const container = checkbox.closest('.form-group-container');
   const daySelectionContainer = container.querySelector('#daySelectionContainer');
+  console.log('showDaySelection:', daySelectionContainer);
   if (daySelectionContainer) {
     if (checkbox.value !== '24/7') {
       daySelectionContainer.style.display = 'block';
@@ -124,6 +130,7 @@ const showDaySelection = (checkbox) => {
 const showMenuSelection = (checkbox) => {
   const container = checkbox.closest('.form-group-container');
   const menuSelectionContainer = container.querySelector('#menuSelectionContainer');
+  console.log('showMenuSelection:', menuSelectionContainer);
   if (menuSelectionContainer) {
     if (checkbox.value === 'MultipleMenus') {
       menuSelectionContainer.style.display = 'block';

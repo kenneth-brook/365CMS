@@ -1,4 +1,4 @@
-import { getMenuTypes, getAverageCosts, addNewMenuType } from '../../../../utils/formUtils.js';
+import { getMenuTypes, addNewMenuType } from '../../../../utils/formUtils.js';
 
 export const renderMenuSelectionSection = (section, labels) => {
   return `
@@ -52,25 +52,28 @@ export const attachMenuSelectionHandlers = async (formContainer, section) => {
     return;
   }
 
+  console.log(`Attaching menu selection handlers for section: ${section}`);
+  console.log('Menu Type Dropdown:', menuTypeDropdown);
+  console.log('Add Menu Type Button:', addMenuTypeButton);
+  console.log('Add New Menu Type Button:', addNewMenuTypeButton);
+  console.log('New Menu Type Input:', newMenuTypeInput);
+  console.log('Menu Type List:', menuTypeList);
+
   const menuTypes = [];
 
   // Fetch initial data
+  console.log(`Fetching menu types for section: ${section}`);
   const fetchedMenuTypes = await getMenuTypes(section);
-  fetchedMenuTypes.forEach(type => {
-    const option = document.createElement('option');
-    option.value = type.id;
-    option.textContent = type.name;
-    menuTypeDropdown.appendChild(option);
-  });
-
-  if (section === 'eat' || section === 'stay') {
-    const fetchedAverageCosts = await getAverageCosts(section);
-    fetchedAverageCosts.forEach(cost => {
+  console.log('Fetched menu types:', fetchedMenuTypes);
+  if (fetchedMenuTypes && fetchedMenuTypes.forEach) {
+    fetchedMenuTypes.forEach(type => {
       const option = document.createElement('option');
-      option.value = cost.id;
-      option.textContent = cost.name;
-      averageCostDropdown.appendChild(option);
+      option.value = type.id;
+      option.textContent = type.name;
+      menuTypeDropdown.appendChild(option);
     });
+  } else {
+    console.error(`Error fetching menu types for section ${section}:`, fetchedMenuTypes);
   }
 
   // Add existing menu type selection
@@ -86,23 +89,30 @@ export const attachMenuSelectionHandlers = async (formContainer, section) => {
   // Add new menu type
   addNewMenuTypeButton.addEventListener('click', async () => {
     const newMenuType = newMenuTypeInput.value.trim();
+    console.log(`Adding new menu type: ${newMenuType} to section: ${section}`);
     if (newMenuType) {
       const response = await addNewMenuType(newMenuType, section);
-      const option = document.createElement('option');
-      option.value = response.id;
-      option.textContent = newMenuType;
-      menuTypeDropdown.appendChild(option);
+      console.log('Add new menu type response:', response);
+      if (response && response.id) {
+        const option = document.createElement('option');
+        option.value = response.id;
+        option.textContent = newMenuType;
+        menuTypeDropdown.appendChild(option);
 
-      const listItem = createMenuListItem(newMenuType, response.id);
-      menuTypeList.appendChild(listItem);
-      menuTypes.push({ id: response.id, name: newMenuType });
+        const listItem = createMenuListItem(newMenuType, response.id);
+        menuTypeList.appendChild(listItem);
+        menuTypes.push({ id: response.id, name: newMenuType });
 
-      newMenuTypeInput.value = '';
+        newMenuTypeInput.value = ''; // Clear the input field
+      } else {
+        console.error(`Error adding new menu type for section ${section}:`, response);
+      }
     }
   });
 
   // Attach to form submission to include menu type data
-  const form = formContainer.querySelector(`#business-form`);
+  const form = formContainer.querySelector(`#main-form`);
+  console.log('Form found for submission:', form);
   if (form) {
     form.addEventListener('submit', (event) => {
       event.preventDefault();

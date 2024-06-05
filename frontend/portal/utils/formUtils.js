@@ -24,9 +24,12 @@ export const fetchAdditionalOptions = async () => {
 };
 
 export const getMenuTypes = async (section) => {
+  console.log(`The section for table location is: ${section}`)
+  const tableName = `${section}_type`;
   try {
-    const response = await apiService.fetch(`menu-types?section=${section}`);
-    return response.data;
+    const response = await apiService.fetch(`menu-types?table=${tableName}`);
+    console.log('Fetched menu types:', response); // Logging the response
+    return response; // Assuming response is the expected array
   } catch (error) {
     console.error(`Error fetching menu types for section ${section}:`, error);
     return [];
@@ -37,7 +40,8 @@ export const getAverageCosts = async (section) => {
   if (section === 'eat' || section === 'stay') {
     try {
       const response = await apiService.fetch(`average-costs?section=${section}`);
-      return response.data;
+      console.log('Fetched average costs:', response); // Logging the response
+      return response; // Assuming response is the expected array
     } catch (error) {
       console.error(`Error fetching average costs for section ${section}:`, error);
       return [];
@@ -47,15 +51,17 @@ export const getAverageCosts = async (section) => {
 };
 
 export const addNewMenuType = async (newMenuType, section) => {
+  const tableName = `${section}_type`;
   try {
     const response = await apiService.fetch('menu-types', {
       method: 'POST',
-      body: JSON.stringify({ name: newMenuType, section }),
+      body: JSON.stringify({ name: newMenuType, table: tableName }),
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    return response.data;
+    console.log('New menu type added:', response); // Logging the response
+    return response; // Assuming response is the expected object
   } catch (error) {
     console.error(`Error adding new menu type for section ${section}:`, error);
     return { id: Date.now(), name: newMenuType }; // Fallback to a mock response
