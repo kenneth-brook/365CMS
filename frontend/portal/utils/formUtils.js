@@ -38,10 +38,12 @@ export const getMenuTypes = async (section) => {
 
 export const getAverageCosts = async (section) => {
   if (section === 'eat' || section === 'stay') {
+    const tableName = `${section}_cost`;
     try {
-      const response = await apiService.fetch(`average-costs?section=${section}`);
+      console.log(`Fetching average costs for table: ${tableName}`);
+      const response = await apiService.fetch(`average-costs?table=${tableName}`);
       console.log('Fetched average costs:', response); // Logging the response
-      return response; // Assuming response is the expected array
+      return response;
     } catch (error) {
       console.error(`Error fetching average costs for section ${section}:`, error);
       return [];

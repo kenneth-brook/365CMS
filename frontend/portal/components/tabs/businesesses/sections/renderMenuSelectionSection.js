@@ -1,4 +1,4 @@
-import { getMenuTypes, addNewMenuType } from '../../../../utils/formUtils.js';
+import { getMenuTypes, getAverageCosts, addNewMenuType } from '../../../../utils/formUtils.js';
 
 export const renderMenuSelectionSection = (section, labels) => {
   return `
@@ -74,6 +74,22 @@ export const attachMenuSelectionHandlers = async (formContainer, section) => {
     });
   } else {
     console.error(`Error fetching menu types for section ${section}:`, fetchedMenuTypes);
+  }
+
+  if (section === 'eat' || section === 'stay') {
+    console.log(`Fetching average costs for section: ${section}`);
+    const fetchedAverageCosts = await getAverageCosts(section);
+    console.log('Fetched average costs:', fetchedAverageCosts);
+    if (fetchedAverageCosts && fetchedAverageCosts.forEach) {
+      fetchedAverageCosts.forEach(cost => {
+        const option = document.createElement('option');
+        option.value = cost.id;
+        option.textContent = `${cost.symbol} - ${cost.description}`;
+        averageCostDropdown.appendChild(option);
+      });
+    } else {
+      console.error(`Error fetching average costs for section ${section}:`, fetchedAverageCosts);
+    }
   }
 
   // Add existing menu type selection

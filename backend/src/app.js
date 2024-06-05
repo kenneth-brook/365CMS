@@ -8,6 +8,7 @@ const role = require('./routes/role');
 const formSubmissionRoutes = require('./routes/formSubmissionRoutes');
 const categoryTypeRoutes = require('./routes/categoryTypeRoutes');
 const menuTypesRoutes = require('./routes/menuTypesRoutes');
+const averageCostRoutes = require('./routes/averageCostRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -31,6 +32,7 @@ app.use('/user-role', role);
 app.use('/form-submission', formSubmissionRoutes);
 app.use('/category-type', categoryTypeRoutes);
 app.use('/menu-types', menuTypesRoutes);
+app.use('/average-costs', averageCostRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
