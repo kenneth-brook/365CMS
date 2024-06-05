@@ -4,7 +4,6 @@ import { renderStayUniqueSection, attachStaySectionHandlers } from './sections/r
 import { renderPlayUniqueSection, attachPlaySectionHandlers } from './sections/renderPlayUniqueSection.js';
 import { renderShopUniqueSection, attachShopSectionHandlers } from './sections/renderShopUniqueSection.js';
 import { renderOtherUniqueSection, attachOtherSectionHandlers } from './sections/renderOtherUniqueSection.js';
-// Import other unique sections as needed
 
 export const renderAdditionalSection = (sectionId, uniqueId) => {
   const dayHoursArray = []; // Array to store the day and hours pairs

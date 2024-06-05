@@ -30,8 +30,8 @@ const uploadFilesToDreamHost = async (formData) => {
   }
 };
 
-const handleMainFormSubmission = async (event, imageFiles) => {
-  event.preventDefault();
+const handleMainFormSubmission = async (imageFiles) => {
+  console.log('Main form submission started');
 
   const formContainer = document.getElementById('form-container');
   const mainForm = formContainer.querySelector('form');
@@ -57,6 +57,8 @@ const handleMainFormSubmission = async (event, imageFiles) => {
       imageUrls: uploadedFiles.slice(1),
     };
 
+    console.log('Submitting main form data:', formDataToSend);
+
     const options = {
       method: 'POST',
       body: JSON.stringify(formDataToSend),
@@ -66,6 +68,7 @@ const handleMainFormSubmission = async (event, imageFiles) => {
     };
 
     const result = await apiService.fetch('form-submission', options);
+    console.log('Main form submission result:', result);
     return result.businessId; // Assume the backend returns the business ID
   } catch (error) {
     console.error('Error submitting the main form:', error);
@@ -102,7 +105,9 @@ const handleSecondaryFormSubmission = async (businessId, formData, sectionType) 
   }
 
   try {
+    console.log(`Submitting ${sectionType} form data:`, formData);
     const response = await apiService.fetch(endpoint, options);
+    console.log(`${sectionType} form submission result:`, response);
     return response[`${sectionType}FormId`]; // Assume the backend returns the form ID
   } catch (error) {
     console.error(`Error submitting ${sectionType} form:`, error);
@@ -110,39 +115,23 @@ const handleSecondaryFormSubmission = async (businessId, formData, sectionType) 
   }
 };
 
-const updateRelationalTable = async (businessId, secondaryFormId) => {
-  try {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ businessId, secondaryFormId }),
-    };
-
-    await apiService.fetch('update-relational-table', options);
-  } catch (error) {
-    console.error('Error updating relational table:', error);
-  }
-};
-
 const handleFormSubmission = async (event, imageFiles) => {
-  event.preventDefault();
+  event.preventDefault(); // Prevent default form submission behavior
+  console.log('Form submission handler triggered');
 
   try {
     // Submit main form and get business ID
-    const businessId = await handleMainFormSubmission(event, imageFiles);
+    const businessId = await handleMainFormSubmission(imageFiles);
 
     // Get all secondary forms
     const secondaryForms = document.querySelectorAll('.additional-section form');
 
-    // Submit each secondary form and update relational table
+    // Submit each secondary form
     for (const secondaryForm of secondaryForms) {
       const formData = new FormData(secondaryForm);
       const sectionType = secondaryForm.dataset.sectionType; // Assuming section type is stored in data attribute
 
-      const secondaryFormId = await handleSecondaryFormSubmission(businessId, formData, sectionType);
-      await updateRelationalTable(businessId, secondaryFormId);
+      await handleSecondaryFormSubmission(businessId, formData, sectionType);
     }
 
     console.log('All forms submitted successfully');

@@ -17,7 +17,7 @@ export const renderCommonSections = (uniqueId) => {
     ${renderImageUploadSection()}
     ${renderDescriptionSection(uniqueId)}
     <div id="saveButtonContainer" class="form-section">
-      <button type="submit" id="saveBusinessButton">Save Business</button>
+      <button type="button" id="saveBusinessButton-${uniqueId}">Save Business</button>
     </div>
   `;
 };
@@ -29,6 +29,17 @@ export const attachCommonHandlers = (formContainer, uniqueId, dayHoursArray) => 
     attachImageUploadHandler(formContainer);
     attachSpecialDayHandlers(uniqueId, dayHoursArray);
     initializeTinyMCE('.description');
+
+    const saveButton = formContainer.querySelector(`#saveBusinessButton-${uniqueId}`);
+    if (saveButton) {
+      saveButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const form = formContainer.querySelector(`#business-form-${uniqueId}`);
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+      });
+    }
   } else {
     console.error('Form container not found');
   }
