@@ -2,7 +2,7 @@ import { renderMenuSelectionSection, attachMenuSelectionHandlers } from './rende
 
 export const renderStayUniqueSection = () => {
   const labels = {
-    menuTypeLabel: 'Room Type',
+    menuTypeLabel: 'Stay Type',
     newMenuTypeLabel: 'Add New Selection',
     averageCostLabel: 'Average Cost',
     showAverageCost: true
