@@ -111,15 +111,7 @@ async function setupDatabaseSchema(client) {
     CREATE TABLE eat (
         id SERIAL PRIMARY KEY,
         business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-        breakfast BOOLEAN DEFAULT false,
-        breakfast_hours VARCHAR(255),
-        breakfast_cost INTEGER REFERENCES eat_cost(id),
-        lunch BOOLEAN DEFAULT false,
-        lunch_hours VARCHAR(255),
-        lunch_cost INTEGER REFERENCES eat_cost(id),
-        dinner BOOLEAN DEFAULT false,
-        dinner_hours VARCHAR(255),
-        dinner_cost INTEGER REFERENCES eat_cost(id),
+        cost INTEGER REFERENCES eat_cost(id),
         name VARCHAR(255),
         phone VARCHAR(20),
         hours JSONB,
@@ -128,8 +120,8 @@ async function setupDatabaseSchema(client) {
         web VARCHAR(255),
         social_platforms JSONB,
         images TEXT[],
-        ad_banner VARCHAR(255),
-        description TEXT
+        description TEXT,
+        logo TEXT
     );
     `;
 

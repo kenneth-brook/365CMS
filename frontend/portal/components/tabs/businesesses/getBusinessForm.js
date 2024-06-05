@@ -30,27 +30,20 @@ const uploadFilesToDreamHost = async (formData) => {
   }
 };
 
-const handleFormSubmission = async (event, imageFiles) => {
+const handleMainFormSubmission = async (event, imageFiles) => {
   event.preventDefault();
 
   const formContainer = document.getElementById('form-container');
-  const forms = formContainer.querySelectorAll('form');
-  const allFormData = new FormData();
-
-  forms.forEach(form => {
-    const formData = new FormData(form);
-    for (let [key, value] of formData.entries()) {
-      allFormData.append(key, value);
-    }
-  });
+  const mainForm = formContainer.querySelector('form');
+  const mainFormData = new FormData(mainForm);
 
   imageFiles.forEach((file) => {
     const uniqueImageFilename = getUniqueFilename(file.name);
-    allFormData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
+    mainFormData.append('imageFiles[]', new File([file], uniqueImageFilename, { type: file.type }));
   });
 
   try {
-    const uploadResult = await uploadFilesToDreamHost(allFormData);
+    const uploadResult = await uploadFilesToDreamHost(mainFormData);
     const uploadedFiles = uploadResult
       .filter((message) => message.includes('uploaded'))
       .map((message) => {
@@ -59,7 +52,7 @@ const handleFormSubmission = async (event, imageFiles) => {
       });
 
     const formDataToSend = {
-      ...Object.fromEntries(allFormData.entries()),
+      ...Object.fromEntries(mainFormData.entries()),
       logoUrl: uploadedFiles[0] || null,
       imageUrls: uploadedFiles.slice(1),
     };
@@ -73,9 +66,89 @@ const handleFormSubmission = async (event, imageFiles) => {
     };
 
     const result = await apiService.fetch('form-submission', options);
+    return result.businessId; // Assume the backend returns the business ID
+  } catch (error) {
+    console.error('Error submitting the main form:', error);
+    throw error;
+  }
+};
+
+const handleSecondaryFormSubmission = async (businessId, formData, sectionType) => {
+  formData.append('businessId', businessId);
+  const options = {
+    method: 'POST',
+    body: formData,
+  };
+
+  let endpoint;
+  switch (sectionType) {
+    case 'eat':
+      endpoint = 'eat-form-submission';
+      break;
+    case 'play':
+      endpoint = 'play-form-submission';
+      break;
+    case 'stay':
+      endpoint = 'stay-form-submission';
+      break;
+    case 'shop':
+      endpoint = 'shop-form-submission';
+      break;
+    case 'other':
+      endpoint = 'other-form-submission';
+      break;
+    default:
+      throw new Error('Unknown section type');
+  }
+
+  try {
+    const response = await apiService.fetch(endpoint, options);
+    return response[`${sectionType}FormId`]; // Assume the backend returns the form ID
+  } catch (error) {
+    console.error(`Error submitting ${sectionType} form:`, error);
+    throw error;
+  }
+};
+
+const updateRelationalTable = async (businessId, secondaryFormId) => {
+  try {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ businessId, secondaryFormId }),
+    };
+
+    await apiService.fetch('update-relational-table', options);
+  } catch (error) {
+    console.error('Error updating relational table:', error);
+  }
+};
+
+const handleFormSubmission = async (event, imageFiles) => {
+  event.preventDefault();
+
+  try {
+    // Submit main form and get business ID
+    const businessId = await handleMainFormSubmission(event, imageFiles);
+
+    // Get all secondary forms
+    const secondaryForms = document.querySelectorAll('.additional-section form');
+
+    // Submit each secondary form and update relational table
+    for (const secondaryForm of secondaryForms) {
+      const formData = new FormData(secondaryForm);
+      const sectionType = secondaryForm.dataset.sectionType; // Assuming section type is stored in data attribute
+
+      const secondaryFormId = await handleSecondaryFormSubmission(businessId, formData, sectionType);
+      await updateRelationalTable(businessId, secondaryFormId);
+    }
+
+    console.log('All forms submitted successfully');
     // Handle success (e.g., display a success message, redirect, etc.)
   } catch (error) {
-    console.error('Error submitting the form:', error);
+    console.error('Error in form submission process:', error);
     // Handle error (e.g., display an error message)
   }
 };
