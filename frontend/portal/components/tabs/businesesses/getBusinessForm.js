@@ -6,7 +6,8 @@ import { renderSocialMediaSection, attachSocialMediaHandlers } from './sections/
 import { renderLogoUploadSection, attachLogoUploadHandler } from './sections/renderLogoUploadSection.js';
 import { renderImageUploadSection, attachImageUploadHandler } from './sections/renderImageUploadSection.js';
 import { renderDescriptionSection, initializeTinyMCE } from './sections/renderDescriptionSection.js';
-import { fetchAdditionalOptions, addAdditionalSection, selectOnlyThis, getUniqueId } from '../../../utils/formUtils.js';
+import { fetchAdditionalOptions, getUniqueId } from '../../../utils/formUtils.js';
+import { renderAdditionalSection } from './renderAdditionalSection.js';
 
 const apiService = new ApiService();
 
@@ -17,12 +18,14 @@ const getUniqueFilename = (filename) => {
 
 const uploadFilesToDreamHost = async (formData) => {
   try {
+    console.log('Uploading files to DreamHost');
     const response = await fetch('https://dev.365easyflow.com/easyflow-images/upload.php', {
       method: 'POST',
       body: formData,
     });
 
     const result = await response.json();
+    console.log('Upload result:', result);
     return result;
   } catch (error) {
     console.error('Error uploading files:', error);
@@ -44,6 +47,8 @@ const handleMainFormSubmission = async (imageFiles) => {
 
   try {
     const uploadResult = await uploadFilesToDreamHost(mainFormData);
+    console.log('Files uploaded:', uploadResult);
+
     const uploadedFiles = uploadResult
       .filter((message) => message.includes('uploaded'))
       .map((message) => {
@@ -78,41 +83,20 @@ const handleMainFormSubmission = async (imageFiles) => {
 
 const handleSecondaryFormSubmission = async (businessId, formData, sectionType) => {
   formData.append('businessId', businessId);
-  const options = {
-    method: 'POST',
-    body: formData,
+  console.log(`Prepared secondary form data for section: ${sectionType}`, Object.fromEntries(formData.entries()));
+
+  // Log the endpoint that would be used
+  const endpoints = {
+    eat: 'eat-form-submission',
+    play: 'play-form-submission',
+    stay: 'stay-form-submission',
+    shop: 'shop-form-submission',
+    other: 'other-form-submission',
   };
 
-  let endpoint;
-  switch (sectionType) {
-    case 'eat':
-      endpoint = 'eat-form-submission';
-      break;
-    case 'play':
-      endpoint = 'play-form-submission';
-      break;
-    case 'stay':
-      endpoint = 'stay-form-submission';
-      break;
-    case 'shop':
-      endpoint = 'shop-form-submission';
-      break;
-    case 'other':
-      endpoint = 'other-form-submission';
-      break;
-    default:
-      throw new Error('Unknown section type');
-  }
-
-  try {
-    console.log(`Submitting ${sectionType} form data:`, formData);
-    const response = await apiService.fetch(endpoint, options);
-    console.log(`${sectionType} form submission result:`, response);
-    return response[`${sectionType}FormId`]; // Assume the backend returns the form ID
-  } catch (error) {
-    console.error(`Error submitting ${sectionType} form:`, error);
-    throw error;
-  }
+  const endpoint = endpoints[sectionType];
+  console.log(`Endpoint for ${sectionType}: ${endpoint}`);
+  return; // Skip actual submission for logging purposes
 };
 
 const handleFormSubmission = async (event, imageFiles) => {
@@ -125,6 +109,7 @@ const handleFormSubmission = async (event, imageFiles) => {
 
     // Get all secondary forms
     const secondaryForms = document.querySelectorAll('.additional-section form');
+    console.log(`Found ${secondaryForms.length} secondary forms to submit.`);
 
     // Submit each secondary form
     for (const secondaryForm of secondaryForms) {
@@ -134,7 +119,7 @@ const handleFormSubmission = async (event, imageFiles) => {
       await handleSecondaryFormSubmission(businessId, formData, sectionType);
     }
 
-    console.log('All forms submitted successfully');
+    console.log('All forms processed successfully');
     // Handle success (e.g., display a success message, redirect, etc.)
   } catch (error) {
     console.error('Error in form submission process:', error);
@@ -185,21 +170,42 @@ export const getBusinessForm = () => {
 
   const imageFiles = initializeSections(formContainer, uniqueId);
 
+  // Ensure elements are available before fetching additional options and adding event listeners
   setTimeout(() => {
     initializeTinyMCE(`#description-${uniqueId}`);
-    fetchAdditionalOptions(); // Ensure fetchAdditionalOptions is called after the DOM is ready
+
+    const additionalDropdown = formContainer.querySelector('#additionalDropdown');
+    const addSectionButton = formContainer.querySelector(`#addSectionButton-${uniqueId}`);
+    const form = formContainer.querySelector(`#business-form-${uniqueId}`);
+
+    if (additionalDropdown && addSectionButton && form) {
+      fetchAdditionalOptions();
+
+      addSectionButton.addEventListener('click', () => {
+        const selectedOption = additionalDropdown.value;
+        if (selectedOption) {
+          const newSectionId = getUniqueId('section');
+          const { sectionHtml, attachHandlers } = renderAdditionalSection(selectedOption, newSectionId);
+
+          const additionalSectionsContainer = formContainer.querySelector('.additional-sections-container');
+          const newSection = document.createElement('div');
+          newSection.classList.add('additional-section');
+          newSection.dataset.id = newSectionId;
+          newSection.dataset.sectionType = selectedOption; // Set section type for later use
+          newSection.innerHTML = `<form id="additional-form-${newSectionId}">${sectionHtml}</form>`;
+
+          additionalSectionsContainer.appendChild(newSection);
+
+          // Attach handlers after section is added to the DOM
+          attachHandlers();
+        }
+      });
+
+      form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
+    } else {
+      console.error('Required elements not found');
+    }
   }, 0);
-
-  const form = formContainer.querySelector(`#business-form-${uniqueId}`);
-  form.addEventListener('submit', (event) => handleFormSubmission(event, imageFiles));
-
-  let firstAddonAdded = false;
-  const addSectionButton = formContainer.querySelector(`#addSectionButton-${uniqueId}`);
-  addSectionButton.addEventListener('click', () => {
-    const newSectionId = getUniqueId('section');
-    addAdditionalSection(firstAddonAdded, newSectionId);
-    firstAddonAdded = true; // Mark that the first addon has been added
-  });
 
   return formContainer;
 };

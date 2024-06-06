@@ -1,6 +1,6 @@
 import { renderMenuSelectionSection, attachMenuSelectionHandlers } from './renderMenuSelectionSection.js';
 
-export const renderEatUniqueSection = () => {
+export const renderEatUniqueSection = (uniqueId) => {
   const labels = {
     menuTypeLabel: 'Menu Type',
     newMenuTypeLabel: 'Add New Selection',
@@ -9,7 +9,7 @@ export const renderEatUniqueSection = () => {
   };
 
   return `
-    <div class="form-section">
+    <div class="form-section" data-id="${uniqueId}">
       <div style="width: 100%" class="form-message">
         <p style="text-align: center; font-weight: bold;">Select menu availability and hours of operation.</p>
       </div>
@@ -78,14 +78,20 @@ export const renderEatUniqueSection = () => {
   `;
 };
 
-export const attachEatSectionHandlers = async (formContainer) => {
+export const attachEatSectionHandlers = async (formContainer, uniqueId) => {
   if (!formContainer) {
     console.error('Form container not found for attaching Eat Section handlers');
     return;
   }
 
-  const operationModelCheckboxes = formContainer.querySelectorAll('input[name="operationModel"]');
-  const menuStyleCheckboxes = formContainer.querySelectorAll('input[name="menuStyle"]');
+  const sectionContainer = formContainer.querySelector(`.form-section[data-id="${uniqueId}"]`);
+  if (!sectionContainer) {
+    console.error(`Section container with id ${uniqueId} not found`);
+    return;
+  }
+
+  const operationModelCheckboxes = sectionContainer.querySelectorAll('input[name="operationModel"]');
+  const menuStyleCheckboxes = sectionContainer.querySelectorAll('input[name="menuStyle"]');
 
   console.log('Attaching handlers for Eat Section:');
   console.log('operationModelCheckboxes:', operationModelCheckboxes);
@@ -108,7 +114,7 @@ export const attachEatSectionHandlers = async (formContainer) => {
   }
 
   console.log('Calling attachMenuSelectionHandlers for section: eat');
-  await attachMenuSelectionHandlers(formContainer, 'eat');
+  await attachMenuSelectionHandlers(sectionContainer, 'eat');
   console.log('Finished calling attachMenuSelectionHandlers for section: eat');
 };
 
