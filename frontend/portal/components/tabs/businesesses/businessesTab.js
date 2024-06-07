@@ -1,8 +1,8 @@
-import { getBusinessForm } from './getBusinessForm.js';
-//import EditBusiness from './EditBusiness.js';
+import { eatForm, initializeEatForm } from './forms/eatForm.js';
+import { stayForm, initializeStayForm } from './forms/stayForm.js';
+import { playForm, initializePlayForm } from './forms/playForm.js';
+import { shopForm, initializeShopForm } from './forms/shopForm.js';
 import ListBusinesses from './listBusinesses.js';
-
-import config from '../../../utils/config.js'
 
 class BusinessesTab {
   constructor(router) {
@@ -29,7 +29,7 @@ class BusinessesTab {
   }
 
   showAddBusiness() {
-    this.addBusinessForm();
+    this.displayBusinessTypeSelection();
   }
 
   showEditBusiness(id) {
@@ -42,70 +42,111 @@ class BusinessesTab {
     // More complex logic to display edit business form
   }
 
-  addBusinessForm() {
+  displayBusinessTypeSelection() {
     const toolArea = document.querySelector('.toolbar');
     const contentArea = document.querySelector('.tab-content');
     toolArea.innerHTML = '';
     contentArea.innerHTML = '';
-    const businessForm = getBusinessForm(); // Get the form HTML
-    contentArea.appendChild(businessForm); // Inject the form HTML
 
-    // Initialize toggle functionality
-    this.initializeToggle();
+    const selectionHtml = `
+      <div>
+        <h3>Select The Type Of Business To Add</h3>
+        <select id="business-type-select">
+          <option value="eat">Eat</option>
+          <option value="stay">Stay</option>
+          <option value="play">Play</option>
+          <option value="shop">Shop</option>
+        </select>
+        <button id="select-business-type-button">Select</button>
+      </div>
+    `;
 
-    // Initialize autofill button
-    this.initializeAutofill();
+    contentArea.innerHTML = selectionHtml;
+
+    document.getElementById('select-business-type-button').addEventListener('click', () => {
+      const selectedType = document.getElementById('business-type-select').value;
+      this.loadBusinessForm(selectedType);
+    });
   }
 
-  initializeToggle() {
-    const toggle = document.getElementById('active-toggle');
-    const statusSpan = document.getElementById('toggle-status');
+  loadBusinessForm(type) {
+    const contentArea = document.querySelector('.tab-content');
+    contentArea.innerHTML = ''; // Clear existing content
 
-    if (toggle && statusSpan) {
-      toggle.addEventListener('change', function() {
-        if (this.checked) {
-          statusSpan.textContent = "Active";
-          statusSpan.style.color = "green";
-        } else {
-          statusSpan.textContent = "Inactive";
-          statusSpan.style.color = "red";
-        }
-      });
-    } else {
-      console.error("Failed to initialize toggle functionality - elements not found.");
+    let formHtml, initializeForm;
+    switch(type) {
+      case 'eat':
+        formHtml = eatForm();
+        initializeForm = initializeEatForm;
+        break;
+      case 'stay':
+        formHtml = stayForm();
+        initializeForm = initializeStayForm;
+        break;
+      case 'play':
+        formHtml = playForm();
+        initializeForm = initializePlayForm;
+        break;
+      case 'shop':
+        formHtml = shopForm();
+        initializeForm = initializeShopForm;
+        break;
+      default:
+        console.error("Invalid business type selected");
+        return;
     }
+
+    contentArea.innerHTML = formHtml;
+    this.initializeForm(contentArea, type, initializeForm);
   }
 
-  initializeAutofill() {
-    const autofillButton = document.getElementById('autofill-button');
-    autofillButton.addEventListener('click', this.handleAutofill.bind(this));
-  }
+  initializeForm(formContainer, type, initializeForm) {
+    initializeForm(formContainer);
 
-  async handleAutofill() {
-    const streetAddress = document.getElementById('streetAddress').value;
-    const city = document.getElementById('city').value;
-    const state = document.getElementById('state').value;
-    const zipCode = document.getElementById('zipCode').value;
+    const combinedForm = formContainer.querySelector('#combined-form');
 
-    const address = `${streetAddress}, ${city}, ${state}, ${zipCode}`;
-    const apiKey = config.google; // Replace with your actual API key
+    combinedForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(combinedForm);
 
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+      const initialFormData = new FormData();
+      initialFormData.append('businessName', formData.get('businessName'));
+      initialFormData.append('streetAddress', formData.get('streetAddress'));
+      initialFormData.append('mailingAddress', formData.get('mailingAddress'));
+      initialFormData.append('city', formData.get('city'));
+      initialFormData.append('state', formData.get('state'));
+      initialFormData.append('zipCode', formData.get('zipCode'));
+      initialFormData.append('latitude', formData.get('latitude'));
+      initialFormData.append('longitude', formData.get('longitude'));
+      initialFormData.append('phone', formData.get('phone'));
+      initialFormData.append('email', formData.get('email'));
+      initialFormData.append('website', formData.get('website'));
+      initialFormData.append('socialPlatform', formData.get('socialPlatform'));
+      initialFormData.append('socialAddress', formData.get('socialAddress'));
+      initialFormData.append('logoFile', formData.get('logoFile'));
+      initialFormData.append('imageFiles', formData.getAll('imageFiles'));
+      initialFormData.append('description', formData.get('description'));
+      initialFormData.append('menuType', formData.get('menuType'));
+      initialFormData.append('newMenuType', formData.get('newMenuType'));
+      initialFormData.append('averageCost', formData.get('averageCost'));
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
+      const businessResponse = await ApiService.createBusiness(initialFormData);
 
-      if (data.status === 'OK') {
-        const location = data.results[0].geometry.location;
-        document.getElementById('latitude').value = location.lat;
-        document.getElementById('longitude').value = location.lng;
-      } else {
-        console.error("Geocode was not successful for the following reason:", data.status);
+      if (businessResponse && businessResponse.id) {
+        const businessId = businessResponse.id;
+        combinedForm.querySelector('#businessId').value = businessId;
+
+        const detailsFormData = new FormData();
+        detailsFormData.append('businessId', businessId);
+        detailsFormData.append('operationModel', formData.get('operationModel'));
+        detailsFormData.append('menuStyle', formData.get('menuStyle'));
+        detailsFormData.append('daysOpen', formData.getAll('daysOpen'));
+        detailsFormData.append('menuType', formData.getAll('menuType'));
+        detailsFormData.append('hoursOpen', formData.getAll('hoursOpen'));
+
+        await ApiService.createBusinessDetails(detailsFormData);
       }
-    } catch (error) {
-      console.error("Error fetching geocode data:", error);
-    }
+    });
   }
 }
 
