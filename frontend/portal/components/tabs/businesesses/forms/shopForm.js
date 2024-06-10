@@ -118,6 +118,61 @@ export const shopForm = () => {
         </div>
         <ul id="menu-type-list"></ul>
       </div>
+      <div class="form-section">
+        <h3>Operational Hours</h3>
+        <table class="hours-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monday</td>
+              <td><input type="text" id="hours-monday" name="hours-monday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Tuesday</td>
+              <td><input type="text" id="hours-tuesday" name="hours-tuesday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Wednesday</td>
+              <td><input type="text" id="hours-wednesday" name="hours-wednesday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Thursday</td>
+              <td><input type="text" id="hours-thursday" name="hours-thursday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Friday</td>
+              <td><input type="text" id="hours-friday" name="hours-friday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Saturday</td>
+              <td><input type="text" id="hours-saturday" name="hours-saturday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+            <tr>
+              <td>Sunday</td>
+              <td><input type="text" id="hours-sunday" name="hours-sunday" placeholder="e.g. 9:00 AM - 5:00 PM"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-section special-day-section">
+        <div class="special-day-container">
+          <label for="special-day">Special Day:</label>
+          <input type="text" id="special-day" class="special-day" name="special-day" />
+        </div>
+        <div class="altered-hours-container">
+          <label for="altered-hours">Altered Hours:</label>
+          <input type="text" id="altered-hours" class="altered-hours" name="altered-hours" />
+        </div>
+        <div class="add-day-container">
+          <button type="button" id="add-day-button">Add Day</button>
+        </div>
+        <div class="day-hours-list" id="day-hours-list"></div>
+      </div>
 
       <button type="submit">Submit</button>
     </form>
@@ -352,6 +407,36 @@ export const initializeTinyMCE = (selector) => {
   });
 }
 
+export const attachSpecialDayHandlers = (dayHoursArray) => {
+  const addButton = document.getElementById(`add-day-button`);
+  const dayInput = document.getElementById(`special-day`);
+  const hoursInput = document.getElementById(`altered-hours`);
+  const listContainer = document.getElementById(`day-hours-list`);
+
+  if (!addButton || !dayInput || !hoursInput || !listContainer) {
+    console.error('One or more elements not found for Special Day handlers');
+    return;
+  }
+
+  addButton.addEventListener('click', () => {
+    const day = dayInput.value.trim();
+    const hours = hoursInput.value.trim();
+
+    if (day && hours) {
+      const listItem = document.createElement('div');
+      listItem.className = 'day-hours-item';
+      listItem.textContent = `${day}: ${hours}`;
+      listContainer.appendChild(listItem);
+
+      dayHoursArray.push({ day, hours });
+
+      // Clear inputs
+      dayInput.value = '';
+      hoursInput.value = '';
+    }
+  });
+};
+
 /* Initialization Function */
 
 export const initializeShopForm = async (formContainer) => {
@@ -360,6 +445,7 @@ export const initializeShopForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
+  attachSpecialDayHandlers(dayHoursArray);
 
   // Initialize menu selection handlers
   await initializeMenuSelection(formContainer);
