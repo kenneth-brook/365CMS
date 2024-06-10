@@ -2,7 +2,8 @@ import { eatForm, initializeEatForm } from './forms/eatForm.js';
 import { stayForm, initializeStayForm } from './forms/stayForm.js';
 import { playForm, initializePlayForm } from './forms/playForm.js';
 import { shopForm, initializeShopForm } from './forms/shopForm.js';
-import ListBusinesses from './listBusinesses.js';
+import ListBusinesses from './listBusinesses.js'; // Ensure this import is present
+import ApiService from '../../../services/apiService.js'; // Ensure ApiService is imported
 
 class BusinessesTab {
   constructor(router) {
@@ -109,42 +110,77 @@ class BusinessesTab {
       event.preventDefault();
       const formData = new FormData(combinedForm);
 
-      const initialFormData = new FormData();
-      initialFormData.append('businessName', formData.get('businessName'));
-      initialFormData.append('streetAddress', formData.get('streetAddress'));
-      initialFormData.append('mailingAddress', formData.get('mailingAddress'));
-      initialFormData.append('city', formData.get('city'));
-      initialFormData.append('state', formData.get('state'));
-      initialFormData.append('zipCode', formData.get('zipCode'));
-      initialFormData.append('latitude', formData.get('latitude'));
-      initialFormData.append('longitude', formData.get('longitude'));
-      initialFormData.append('phone', formData.get('phone'));
-      initialFormData.append('email', formData.get('email'));
-      initialFormData.append('website', formData.get('website'));
-      initialFormData.append('socialPlatform', formData.get('socialPlatform'));
-      initialFormData.append('socialAddress', formData.get('socialAddress'));
-      initialFormData.append('logoFile', formData.get('logoFile'));
-      initialFormData.append('imageFiles', formData.getAll('imageFiles'));
-      initialFormData.append('description', formData.get('description'));
-      initialFormData.append('menuType', formData.get('menuType'));
-      initialFormData.append('newMenuType', formData.get('newMenuType'));
-      initialFormData.append('averageCost', formData.get('averageCost'));
+      try {
+        // First submission for initial business data
+        const initialFormData = new FormData();
+        initialFormData.append('businessName', formData.get('businessName'));
+        initialFormData.append('streetAddress', formData.get('streetAddress'));
+        initialFormData.append('mailingAddress', formData.get('mailingAddress'));
+        initialFormData.append('city', formData.get('city'));
+        initialFormData.append('state', formData.get('state'));
+        initialFormData.append('zipCode', formData.get('zipCode'));
+        initialFormData.append('latitude', formData.get('latitude'));
+        initialFormData.append('longitude', formData.get('longitude'));
+        initialFormData.append('phone', formData.get('phone'));
+        initialFormData.append('email', formData.get('email'));
+        initialFormData.append('website', formData.get('website'));
+        initialFormData.append('socialPlatform', formData.get('socialPlatform'));
+        initialFormData.append('socialAddress', formData.get('socialAddress'));
+        initialFormData.append('logoFile', formData.get('logoFile'));
+        initialFormData.append('imageFiles', formData.getAll('imageFiles'));
+        initialFormData.append('description', formData.get('description'));
 
-      const businessResponse = await ApiService.createBusiness(initialFormData);
+        const businessResponse = await ApiService.createBusiness(initialFormData);
 
-      if (businessResponse && businessResponse.id) {
-        const businessId = businessResponse.id;
-        combinedForm.querySelector('#businessId').value = businessId;
+        if (businessResponse && businessResponse.id) {
+          const businessId = businessResponse.id;
+          combinedForm.querySelector('#businessId').value = businessId;
 
-        const detailsFormData = new FormData();
-        detailsFormData.append('businessId', businessId);
-        detailsFormData.append('operationModel', formData.get('operationModel'));
-        detailsFormData.append('menuStyle', formData.get('menuStyle'));
-        detailsFormData.append('daysOpen', formData.getAll('daysOpen'));
-        detailsFormData.append('menuType', formData.getAll('menuType'));
-        detailsFormData.append('hoursOpen', formData.getAll('hoursOpen'));
+          // Second submission for business-specific data
+          const detailsFormData = new FormData();
+          detailsFormData.append('businessId', businessId);
 
-        await ApiService.createBusinessDetails(detailsFormData);
+          if (type === 'eat') {
+            const menuTypes = formData.getAll('menuType');
+            detailsFormData.append('menuTypes', JSON.stringify(menuTypes.map(id => ({ id }))));
+            detailsFormData.append('cost', formData.get('cost'));
+            detailsFormData.append('name', formData.get('name'));
+            detailsFormData.append('phone', formData.get('phone'));
+            detailsFormData.append('hours', formData.get('hours'));
+            detailsFormData.append('special_days', formData.get('special_days'));
+            detailsFormData.append('email', formData.get('email'));
+            detailsFormData.append('web', formData.get('web'));
+            detailsFormData.append('social_platforms', formData.get('social_platforms'));
+            detailsFormData.append('images', formData.get('images'));
+            detailsFormData.append('description', formData.get('description'));
+            detailsFormData.append('logo', formData.get('logo'));
+
+            const eatResponse = await ApiService.submitEatForm(detailsFormData);
+
+            if (eatResponse && eatResponse.eatFormId) {
+              const eatId = eatResponse.eatFormId;
+              const menuTypesArray = JSON.parse(detailsFormData.get('menuTypes'));
+              for (const menuType of menuTypesArray) {
+                await ApiService.insertEatType(eatId, menuType.id);
+              }
+            }
+          }
+
+          // Add other type-specific fields as needed
+          if (type === 'play') {
+            // Add play-specific fields
+          }
+
+          if (type === 'shop') {
+            // Add shop-specific fields
+          }
+
+          if (type === 'stay') {
+            // Add stay-specific fields
+          }
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
       }
     });
   }

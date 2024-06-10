@@ -31,4 +31,21 @@ router.post('/eat-form-submission', async (req, res) => {
   }
 });
 
+router.post('/eat-eat-type', async (req, res) => {
+  const pool = await getDbPool();
+  const client = await pool.connect();
+  try {
+    const { eatId, typeId } = req.body;
+
+    await client.query('INSERT INTO eat_eat_type (eat_id, eat_type_id) VALUES ($1, $2)', [eatId, typeId]);
+
+    res.status(200).json({ message: 'Eat type inserted successfully' });
+  } catch (error) {
+    console.error('Error inserting eat type:', error);
+    res.status(500).send('Error inserting eat type');
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;

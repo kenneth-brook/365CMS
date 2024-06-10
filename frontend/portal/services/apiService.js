@@ -38,6 +38,30 @@ class ApiService {
     // Redirect to login page
     window.location.href = '../';
   }
+
+  async createBusiness(formData) {
+    return this.fetch('form-submission', {
+      method: 'POST',
+      body: formData
+    });
+  }
+
+  async submitEatForm(formData) {
+    return this.fetch('eat-form-submission/eat-form-submission', { // Ensure correct path is used
+      method: 'POST',
+      body: formData
+    });
+  }
+
+  async insertEatType(eatId, typeId) {
+    return this.fetch('eat-form-submission/eat-eat-type', { // Ensure correct path is used
+      method: 'POST',
+      body: JSON.stringify({ eatId, typeId }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
 }
 
 export default ApiService;

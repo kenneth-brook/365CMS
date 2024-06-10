@@ -477,7 +477,7 @@ export const initializeEatForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
-  attachSpecialDayHandlers(dayHoursArray);
+  attachSpecialDayHandlers();
 
   // Initialize hour and menu selection handlers
   const sectionContainer = formContainer.querySelector(`.form-section[data-id="hours"]`);

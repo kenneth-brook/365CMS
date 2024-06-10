@@ -445,7 +445,7 @@ export const initializePlayForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
-  attachSpecialDayHandlers(dayHoursArray);
+  attachSpecialDayHandlers();
 
   // Initialize menu selection handlers
   await initializeMenuSelection(formContainer);

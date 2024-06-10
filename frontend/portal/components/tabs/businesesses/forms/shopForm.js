@@ -98,26 +98,7 @@ export const shopForm = () => {
         </div>
       </div>
       
-      <!-- Menu Selection Section -->
-      <div class="form-section" id="menu-selection-section">
-        <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
-          <div class="form-group">
-            <label for="menuType">Menu Type:</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <select id="menuType" name="menuType"></select>
-              <button type="button" id="add-menu-type">Add Selection</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="newMenuType">New Menu Type:</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <input type="text" id="newMenuType" name="newMenuType">
-              <button type="button" id="add-new-menu-type">Add</button>
-            </div>
-          </div>
-        </div>
-        <ul id="menu-type-list"></ul>
-      </div>
+      <!-- Shop Specific Section -->
       <div class="form-section">
         <h3>Operational Hours</h3>
         <table class="hours-table">
@@ -445,105 +426,7 @@ export const initializeShopForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
-  attachSpecialDayHandlers(dayHoursArray);
-
-  // Initialize menu selection handlers
-  await initializeMenuSelection(formContainer);
-}
-
-export const initializeMenuSelection = async (formContainer) => {
-  const menuTypeDropdown = formContainer.querySelector(`#menuType`);
-  const addMenuTypeButton = formContainer.querySelector(`#add-menu-type`);
-  const addNewMenuTypeButton = formContainer.querySelector(`#add-new-menu-type`);
-  const newMenuTypeInput = formContainer.querySelector(`#newMenuType`);
-  const menuTypeList = formContainer.querySelector(`#menu-type-list`);
-
-  const menuTypes = [];
-
-  const fetchedMenuTypes = await getMenuTypes();
-  console.log('Fetched menu types:', fetchedMenuTypes);
-  if (fetchedMenuTypes && fetchedMenuTypes.forEach) {
-    fetchedMenuTypes.forEach(type => {
-      const option = document.createElement('option');
-      option.value = type.id;
-      option.textContent = type.name;
-      menuTypeDropdown.appendChild(option);
-    });
-  } else {
-    console.error(`Error fetching menu types:`, fetchedMenuTypes);
-  }
-
-  // Add existing menu type selection
-  addMenuTypeButton.addEventListener('click', () => {
-    const selectedOption = menuTypeDropdown.options[menuTypeDropdown.selectedIndex];
-    if (selectedOption) {
-      const listItem = createMenuListItem(selectedOption.textContent, selectedOption.value);
-      menuTypeList.appendChild(listItem);
-      menuTypes.push({ id: selectedOption.value, name: selectedOption.textContent });
-    }
-  });
-
-  // Add new menu type
-  addNewMenuTypeButton.addEventListener('click', async () => {
-    const newMenuType = newMenuTypeInput.value.trim();
-    console.log(`Adding new menu type: ${newMenuType}`);
-    if (newMenuType) {
-      const response = await addNewMenuType(newMenuType);
-      console.log('Add new menu type response:', response);
-      if (response && response.id) {
-        const option = document.createElement('option');
-        option.value = response.id;
-        option.textContent = newMenuType;
-        menuTypeDropdown.appendChild(option);
-
-        const listItem = createMenuListItem(newMenuType, response.id);
-        menuTypeList.appendChild(listItem);
-        menuTypes.push({ id: response.id, name: newMenuType });
-
-        newMenuTypeInput.value = ''; // Clear the input field
-      } else {
-        console.error(`Error adding new menu type:`, response);
-      }
-    }
-  });
-
-  // Attach to form submission to include menu type data
-  const form = formContainer.querySelector(`#combined-form`);
-  console.log('Form found for submission:', form);
-  if (form) {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-
-      const menuTypesInput = document.createElement('input');
-      menuTypesInput.type = 'hidden';
-      menuTypesInput.name = `menuTypes-shop`;
-      menuTypesInput.value = JSON.stringify(menuTypes);
-      form.appendChild(menuTypesInput);
-
-      form.submit(); // Submit the form after appending the hidden input
-    });
-  } else {
-    console.error('Form not found in the form container');
-  }
-
-  // Helper function to create list items with a remove button
-  function createMenuListItem(name, id) {
-    const listItem = document.createElement('li');
-    listItem.textContent = `${name}`;
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'x';
-    removeButton.style.color = 'red';
-    removeButton.style.marginLeft = '10px';
-    removeButton.addEventListener('click', () => {
-      menuTypeList.removeChild(listItem);
-      const index = menuTypes.findIndex(type => type.id === id);
-      if (index > -1) {
-        menuTypes.splice(index, 1);
-      }
-    });
-    listItem.appendChild(removeButton);
-    return listItem;
-  }
+  attachSpecialDayHandlers();
 }
 
 export const getMenuTypes = async () => {
