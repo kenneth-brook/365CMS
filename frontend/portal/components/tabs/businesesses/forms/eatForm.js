@@ -747,3 +747,30 @@ export const addNewMenuType = async (newMenuType) => {
     return { id: Date.now(), name: newMenuType }; // Fallback to a mock response
   }
 };
+
+// Function to handle adding social media entries
+function addSocialMediaEntry() {
+  const platform = document.getElementById('socialPlatform').value;
+  const address = document.getElementById('socialAddress').value;
+
+  if (platform && address) {
+    const listItem = document.createElement('li');
+    listItem.textContent = `${platform}: ${address}`;
+    listItem.setAttribute('data-platform', platform);
+    listItem.setAttribute('data-address', address);
+
+    const socialMediaList = document.getElementById('social-media-list');
+    socialMediaList.appendChild(listItem);
+
+    // Clear inputs
+    document.getElementById('socialPlatform').value = '';
+    document.getElementById('socialAddress').value = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const formContainer = document.querySelector('.tab-content');
+  if (formContainer) {
+    initializeEatForm(formContainer);
+  }
+});

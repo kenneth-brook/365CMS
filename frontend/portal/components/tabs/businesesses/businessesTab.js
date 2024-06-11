@@ -5,9 +5,32 @@ import { shopForm, initializeShopForm } from './forms/shopForm.js';
 import ListBusinesses from './listBusinesses.js'; // Ensure this import is present
 import ApiService from '../../../services/apiService.js'; // Ensure ApiService is imported
 
+const getUniqueFilename = (filename) => {
+  const date = new Date().toISOString().replace(/[-:.]/g, '');
+  return `${date}_${filename}`;
+};
+
+const uploadFilesToDreamHost = async (formData) => {
+  try {
+    console.log('Uploading files to DreamHost');
+    const response = await fetch('https://dev.365easyflow.com/easyflow-images/upload.php', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log('Upload result:', result);
+    return result;
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    throw error;
+  }
+};
+
 class BusinessesTab {
   constructor(router) {
     this.router = router;
+    this.apiService = new ApiService();
     this.setupRoutes();
   }
 
@@ -101,6 +124,38 @@ class BusinessesTab {
     this.initializeForm(contentArea, type, initializeForm);
   }
 
+  async handleFileUploads(formData) {
+    console.log('Inside handleFileUploads function');
+    // Example implementation of file uploads to DreamHost
+    try {
+      const logoFile = formData.get('logoFile');
+      const imageFiles = formData.getAll('imageFiles');
+  
+      if (logoFile) {
+        const logoFormData = new FormData();
+        const uniqueLogoFilename = getUniqueFilename(logoFile.name);
+        logoFormData.append('file', logoFile, uniqueLogoFilename);
+        const logoUploadResult = await uploadFilesToDreamHost(logoFormData);
+        console.log('Logo upload result:', logoUploadResult);
+        formData.set('logoFile', logoUploadResult.url);  // Assuming 'url' contains the uploaded file URL
+      }
+  
+      if (imageFiles && imageFiles.length > 0) {
+        for (const imageFile of imageFiles) {
+          const imageFormData = new FormData();
+          const uniqueImageFilename = getUniqueFilename(imageFile.name);
+          imageFormData.append('file', imageFile, uniqueImageFilename);
+          const imageUploadResult = await uploadFilesToDreamHost(imageFormData);
+          console.log('Image upload result:', imageUploadResult);
+          formData.append('imageFiles', imageUploadResult.url);  // Assuming 'url' contains the uploaded file URL
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      throw error;
+    }
+  }  
+
   initializeForm(formContainer, type, initializeForm) {
     initializeForm(formContainer);
 
@@ -108,11 +163,16 @@ class BusinessesTab {
 
     combinedForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      console.log('Form submission started');
       const formData = new FormData(combinedForm);
 
       try {
+        // Handle file uploads
+        await this.handleFileUploads(formData);
+
         // First submission for initial business data
         const initialFormData = new FormData();
+        initialFormData.append('active', formData.get('active') ? 'true' : 'false');
         initialFormData.append('businessName', formData.get('businessName'));
         initialFormData.append('streetAddress', formData.get('streetAddress'));
         initialFormData.append('mailingAddress', formData.get('mailingAddress'));
@@ -124,8 +184,16 @@ class BusinessesTab {
         initialFormData.append('phone', formData.get('phone'));
         initialFormData.append('email', formData.get('email'));
         initialFormData.append('website', formData.get('website'));
-        initialFormData.append('socialPlatform', formData.get('socialPlatform'));
-        initialFormData.append('socialAddress', formData.get('socialAddress'));
+
+        // Handling social media as JSON array
+        const socialMediaArray = [];
+        document.querySelectorAll('#social-media-list li').forEach((item) => {
+          const platform = item.getAttribute('data-platform');
+          const address = item.getAttribute('data-address');
+          socialMediaArray.push({ platform, address });
+        });
+        initialFormData.append('socialPlatforms', JSON.stringify(socialMediaArray));
+
         initialFormData.append('logoFile', formData.get('logoFile'));
         initialFormData.append('imageFiles', formData.getAll('imageFiles'));
         initialFormData.append('description', formData.get('description'));
@@ -143,17 +211,13 @@ class BusinessesTab {
           if (type === 'eat') {
             const menuTypes = formData.getAll('menuType');
             detailsFormData.append('menuTypes', JSON.stringify(menuTypes.map(id => ({ id }))));
-            detailsFormData.append('cost', formData.get('cost'));
-            detailsFormData.append('name', formData.get('name'));
-            detailsFormData.append('phone', formData.get('phone'));
-            detailsFormData.append('hours', formData.get('hours'));
-            detailsFormData.append('special_days', formData.get('special_days'));
-            detailsFormData.append('email', formData.get('email'));
-            detailsFormData.append('web', formData.get('web'));
-            detailsFormData.append('social_platforms', formData.get('social_platforms'));
-            detailsFormData.append('images', formData.get('images'));
-            detailsFormData.append('description', formData.get('description'));
-            detailsFormData.append('logo', formData.get('logo'));
+            detailsFormData.append('averageCost', formData.get('averageCost'));
+            detailsFormData.append('operationModel', formData.get('operationModel'));
+            detailsFormData.append('menuStyle', formData.get('menuStyle'));
+            detailsFormData.append('daysOpen', JSON.stringify(formData.getAll('daysOpen')));
+            detailsFormData.append('hoursOpen', JSON.stringify(formData.getAll('hoursOpen')));
+            detailsFormData.append('special_day', formData.get('special-day'));
+            detailsFormData.append('altered_hours', formData.get('altered-hours'));
 
             const eatResponse = await ApiService.submitEatForm(detailsFormData);
 

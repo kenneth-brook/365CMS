@@ -40,27 +40,37 @@ class ApiService {
   }
 
   async createBusiness(formData) {
-    return this.fetch('form-submission', {
+    const response = await this.fetch('form-submission', {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
     });
+    return response;
   }
 
   async submitEatForm(formData) {
-    return this.fetch('eat-form-submission/eat-form-submission', { // Ensure correct path is used
+    const response = await this.fetch('eat-form-submission', {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
     });
+    return response;
   }
 
   async insertEatType(eatId, typeId) {
-    return this.fetch('eat-form-submission/eat-eat-type', { // Ensure correct path is used
+    const response = await this.fetch('eat-form-submission/type', {
       method: 'POST',
       body: JSON.stringify({ eatId, typeId }),
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
+    return response;
   }
 }
 
