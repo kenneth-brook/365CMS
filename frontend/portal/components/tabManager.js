@@ -8,7 +8,7 @@ import OfficeTab from './tabs/office/officeTab.js';
 class TabManager {
   constructor(store, apiService, router) {
     this.store = store;
-    this.apiService = apiService;
+    this.apiService = apiService; // Store the instance of ApiService
     this.router = router;
     this.tabs = [];
     this.tabContainer = document.querySelector('.tab-links');
@@ -17,9 +17,9 @@ class TabManager {
 
   setupTabs() {
     console.log("Setting up tabs");
-    this.tabs.push({ id: 'businesses/list', title: 'Businesses', instance: new BusinessesTab(this.router) });
-    this.tabs.push({ id: 'events/list', title: 'Events', instance: new EventsTab(this.router) });
-    this.tabs.push({ id: 'office/list', title: 'Office', instance: new OfficeTab(this.router) });
+    this.tabs.push({ id: 'businesses/list', title: 'Businesses', instance: new BusinessesTab(this.router, this.apiService) });
+    this.tabs.push({ id: 'events/list', title: 'Events', instance: new EventsTab(this.router, this.apiService) });
+    this.tabs.push({ id: 'office/list', title: 'Office', instance: new OfficeTab(this.router, this.apiService) });
 
     this.renderTabs();
 
@@ -73,5 +73,3 @@ class TabManager {
 }
 
 export default TabManager;
-
-

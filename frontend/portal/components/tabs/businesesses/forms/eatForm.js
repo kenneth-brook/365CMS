@@ -79,14 +79,14 @@ export const eatForm = () => {
       <div class="form-section">
         <div class="form-group">
           <label for="logoUpload">Business Logo:</label>
-          <input type="file" id="logoUpload" name="logoFile" accept="image/*">
+          <input type="file" id="logoUpload" name="logoUrl" accept="image/*">
         </div>
         <div id="logo-preview" class="thumbnail-container"></div>
       </div>
       <div class="form-section" id="image-upload-section">
         <div class="form-group">
           <label for="imageUpload">Upload Images:</label>
-          <input type="file" id="imageUpload" name="imageFiles" multiple>
+          <input type="file" id="imageUpload" name="imageUrls" multiple>
         </div>
         <div id="image-thumbnails"></div>
         <ul id="image-file-list"></ul>

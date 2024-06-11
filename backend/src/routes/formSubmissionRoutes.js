@@ -49,6 +49,10 @@ router.post('/', async (req, res) => {
     // Parse active status boolean
     const isActive = active === 'true';
 
+    // Handle empty fields for arrays
+    const logoUrlValue = logoUrl || null;
+    const imageUrlsArray = imageUrls ? JSON.parse(imageUrls) : [];
+
     // Get database connection pool
     const pool = await getDbPool();
 
@@ -61,7 +65,7 @@ router.post('/', async (req, res) => {
       const businessResult = await client.query(
         `INSERT INTO businesses (active, name, street_address, mailing_address, city, state, zip, lat, long, phone, email, web, social_platforms, images, description, chamber_member, logo)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
-        [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, JSON.stringify(socialMediaArray), imageUrls, description, isChamberMember, logoUrl]
+        [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude, longitude, phone, email, website, JSON.stringify(socialMediaArray), imageUrlsArray.length ? imageUrlsArray : null, description, isChamberMember, logoUrlValue]
       );
 
       await client.query('COMMIT');

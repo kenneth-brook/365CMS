@@ -28,9 +28,9 @@ const uploadFilesToDreamHost = async (formData) => {
 };
 
 class BusinessesTab {
-  constructor(router) {
+  constructor(router, apiService) {
     this.router = router;
-    this.apiService = new ApiService();
+    this.apiService = apiService; // Store the instance of ApiService
     this.setupRoutes();
   }
 
@@ -124,38 +124,6 @@ class BusinessesTab {
     this.initializeForm(contentArea, type, initializeForm);
   }
 
-  async handleFileUploads(formData) {
-    console.log('Inside handleFileUploads function');
-    // Example implementation of file uploads to DreamHost
-    try {
-      const logoFile = formData.get('logoFile');
-      const imageFiles = formData.getAll('imageFiles');
-  
-      if (logoFile) {
-        const logoFormData = new FormData();
-        const uniqueLogoFilename = getUniqueFilename(logoFile.name);
-        logoFormData.append('file', logoFile, uniqueLogoFilename);
-        const logoUploadResult = await uploadFilesToDreamHost(logoFormData);
-        console.log('Logo upload result:', logoUploadResult);
-        formData.set('logoFile', logoUploadResult.url);  // Assuming 'url' contains the uploaded file URL
-      }
-  
-      if (imageFiles && imageFiles.length > 0) {
-        for (const imageFile of imageFiles) {
-          const imageFormData = new FormData();
-          const uniqueImageFilename = getUniqueFilename(imageFile.name);
-          imageFormData.append('file', imageFile, uniqueImageFilename);
-          const imageUploadResult = await uploadFilesToDreamHost(imageFormData);
-          console.log('Image upload result:', imageUploadResult);
-          formData.append('imageFiles', imageUploadResult.url);  // Assuming 'url' contains the uploaded file URL
-        }
-      }
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      throw error;
-    }
-  }  
-
   initializeForm(formContainer, type, initializeForm) {
     initializeForm(formContainer);
 
@@ -167,11 +135,12 @@ class BusinessesTab {
       const formData = new FormData(combinedForm);
 
       try {
-        // Handle file uploads
+        console.log('Handling file uploads');
         await this.handleFileUploads(formData);
+        console.log('File uploads handled successfully');
 
         // First submission for initial business data
-        const initialFormData = new FormData();
+        const initialFormData = new URLSearchParams();
         initialFormData.append('active', formData.get('active') ? 'true' : 'false');
         initialFormData.append('businessName', formData.get('businessName'));
         initialFormData.append('streetAddress', formData.get('streetAddress'));
@@ -192,23 +161,28 @@ class BusinessesTab {
           const address = item.getAttribute('data-address');
           socialMediaArray.push({ platform, address });
         });
-        initialFormData.append('socialPlatforms', JSON.stringify(socialMediaArray));
+        initialFormData.append('socialMedia', JSON.stringify(socialMediaArray));
 
-        initialFormData.append('logoFile', formData.get('logoFile'));
-        initialFormData.append('imageFiles', formData.getAll('imageFiles'));
+        initialFormData.append('logoUrl', formData.get('logoFile'));
+        initialFormData.append('imageUrls', formData.getAll('imageFiles'));
         initialFormData.append('description', formData.get('description'));
 
-        const businessResponse = await ApiService.createBusiness(initialFormData);
+        console.log('URLSearchParams:', initialFormData.toString());
+
+        console.log('Submitting initial form data');
+        const businessResponse = await this.apiService.createBusiness(initialFormData);
 
         if (businessResponse && businessResponse.id) {
+          console.log('Initial form data submitted successfully');
           const businessId = businessResponse.id;
           combinedForm.querySelector('#businessId').value = businessId;
 
           // Second submission for business-specific data
-          const detailsFormData = new FormData();
+          const detailsFormData = new URLSearchParams();
           detailsFormData.append('businessId', businessId);
 
           if (type === 'eat') {
+            console.log('Preparing eat form data');
             const menuTypes = formData.getAll('menuType');
             detailsFormData.append('menuTypes', JSON.stringify(menuTypes.map(id => ({ id }))));
             detailsFormData.append('averageCost', formData.get('averageCost'));
@@ -219,27 +193,32 @@ class BusinessesTab {
             detailsFormData.append('special_day', formData.get('special-day'));
             detailsFormData.append('altered_hours', formData.get('altered-hours'));
 
-            const eatResponse = await ApiService.submitEatForm(detailsFormData);
+            console.log('Submitting eat form data');
+            const eatResponse = await this.apiService.submitEatForm(detailsFormData);
 
             if (eatResponse && eatResponse.eatFormId) {
+              console.log('Eat form data submitted successfully');
               const eatId = eatResponse.eatFormId;
               const menuTypesArray = JSON.parse(detailsFormData.get('menuTypes'));
               for (const menuType of menuTypesArray) {
-                await ApiService.insertEatType(eatId, menuType.id);
+                await this.apiService.insertEatType(eatId, menuType.id);
               }
             }
           }
 
           // Add other type-specific fields as needed
           if (type === 'play') {
+            console.log('Preparing play form data');
             // Add play-specific fields
           }
 
           if (type === 'shop') {
+            console.log('Preparing shop form data');
             // Add shop-specific fields
           }
 
           if (type === 'stay') {
+            console.log('Preparing stay form data');
             // Add stay-specific fields
           }
         }
@@ -247,6 +226,38 @@ class BusinessesTab {
         console.error('Error submitting form:', error);
       }
     });
+  }
+
+  async handleFileUploads(formData) {
+    console.log('Inside handleFileUploads function');
+    // Example implementation of file uploads to DreamHost
+    try {
+      const logoFile = formData.get('logoFile');
+      const imageFiles = formData.getAll('imageFiles');
+
+      if (logoFile) {
+        const logoFormData = new FormData();
+        const uniqueLogoFilename = getUniqueFilename(logoFile.name);
+        logoFormData.append('file', logoFile, uniqueLogoFilename);
+        const logoUploadResult = await uploadFilesToDreamHost(logoFormData);
+        console.log('Logo upload result:', logoUploadResult);
+        formData.set('logoFile', logoUploadResult.url);  // Assuming 'url' contains the uploaded file URL
+      }
+
+      if (imageFiles && imageFiles.length > 0) {
+        for (const imageFile of imageFiles) {
+          const imageFormData = new FormData();
+          const uniqueImageFilename = getUniqueFilename(imageFile.name);
+          imageFormData.append('file', imageFile, uniqueImageFilename);
+          const imageUploadResult = await uploadFilesToDreamHost(imageFormData);
+          console.log('Image upload result:', imageUploadResult);
+          formData.append('imageFiles', imageUploadResult.url);  // Assuming 'url' contains the uploaded file URL
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      throw error;
+    }
   }
 }
 
