@@ -10,6 +10,7 @@ class Router {
     }
   
     navigate(hash) {
+      console.log(`Navigating to: ${hash}`);
       window.location.hash = hash;
     }
   

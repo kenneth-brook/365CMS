@@ -39,15 +39,14 @@ class ApiService {
     window.location.href = '../';
   }
 
-  async createBusiness(formData) {
-    const response = await this.fetch('form-submission', {
+  async createBusiness(data) {
+    return this.fetch('form-submission', {
       method: 'POST',
-      body: formData,
+      body: data,
       headers: {
         'Accept': 'application/json'
       }
     });
-    return response;
   }
 
   async submitEatForm(formData) {
@@ -61,16 +60,14 @@ class ApiService {
     return response;
   }
 
-  async insertEatType(eatId, typeId) {
-    const response = await this.fetch('eat-form-submission/type', {
+  async insertEatType(eatId, eatTypeId) {
+    return this.fetch('eat-type-insert', {
       method: 'POST',
-      body: JSON.stringify({ eatId, typeId }),
+      body: JSON.stringify({ eatId, eatTypeId }),
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Content-Type': 'application/json'
       }
     });
-    return response;
   }
 }
 

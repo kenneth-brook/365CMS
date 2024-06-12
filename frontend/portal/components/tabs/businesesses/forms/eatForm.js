@@ -205,8 +205,9 @@ export const eatForm = () => {
         </div>
         <div class="day-hours-list" id="day-hours-list"></div>
       </div>
+      <input type="hidden" id="businessId" name="businessId" value="">
 
-      <button type="submit">Submit</button>
+      <button type="button" id="submitButton">Submit</button>
     </form>
   `;
 }
@@ -439,34 +440,31 @@ export const initializeTinyMCE = (selector) => {
   });
 }
 
-export const attachSpecialDayHandlers = (dayHoursArray) => {
-  const addButton = document.getElementById(`add-day-button`);
-  const dayInput = document.getElementById(`special-day`);
-  const hoursInput = document.getElementById(`altered-hours`);
-  const listContainer = document.getElementById(`day-hours-list`);
+const attachSpecialDayHandlers = (formContainer) => {
+  const specialDays = [];
+  formContainer.querySelector('#add-day-button').addEventListener('click', () => {
+    const specialDayInput = formContainer.querySelector('#special-day');
+    const alteredHoursInput = formContainer.querySelector('#altered-hours');
+    const specialDay = specialDayInput.value.trim();
+    const alteredHours = alteredHoursInput.value.trim();
 
-  if (!addButton || !dayInput || !hoursInput || !listContainer) {
-    console.error('One or more elements not found for Special Day handlers');
-    return;
-  }
+    if (specialDay && alteredHours) {
+      specialDays.push({ day: specialDay, hours: alteredHours });
 
-  addButton.addEventListener('click', () => {
-    const day = dayInput.value.trim();
-    const hours = hoursInput.value.trim();
-
-    if (day && hours) {
+      // Display the added special day and altered hours
+      const dayHoursList = formContainer.querySelector('#day-hours-list');
       const listItem = document.createElement('div');
       listItem.className = 'day-hours-item';
-      listItem.textContent = `${day}: ${hours}`;
-      listContainer.appendChild(listItem);
+      listItem.textContent = `${specialDay}: ${alteredHours}`;
+      dayHoursList.appendChild(listItem);
 
-      dayHoursArray.push({ day, hours });
-
-      // Clear inputs
-      dayInput.value = '';
-      hoursInput.value = '';
+      // Clear input fields
+      specialDayInput.value = '';
+      alteredHoursInput.value = '';
     }
   });
+
+  return specialDays;
 };
 
 /* Initialization Function */
@@ -477,7 +475,7 @@ export const initializeEatForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
-  attachSpecialDayHandlers();
+  const specialDays = attachSpecialDayHandlers(formContainer);
 
   // Initialize hour and menu selection handlers
   const sectionContainer = formContainer.querySelector(`.form-section[data-id="hours"]`);
