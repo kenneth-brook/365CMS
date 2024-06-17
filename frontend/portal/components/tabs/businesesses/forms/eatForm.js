@@ -126,7 +126,7 @@ export const eatForm = () => {
       </div>
 
       <!-- Details Form Fields -->
-      <div class="form-section" data-id="hours">
+      <!-- <div class="form-section" data-id="hours">
         <div style="width: 100%" class="form-message">
           <p style="text-align: center; font-weight: bold;">Select menu availability and hours of operation.</p>
         </div>
@@ -190,7 +190,7 @@ export const eatForm = () => {
             <tbody></tbody>
           </table>
         </div>
-      </div>
+      </div> -->
       <div class="form-section special-day-section">
         <div class="special-day-container">
           <label for="special-day">Special Day:</label>
@@ -478,30 +478,30 @@ export const initializeEatForm = async (formContainer) => {
   attachSpecialDayHandlers(formContainer);
 
   // Initialize hour and menu selection handlers
-  const sectionContainer = formContainer.querySelector(`.form-section[data-id="hours"]`);
-  if (!sectionContainer) {
-    console.error(`Section container with id hours not found`);
-    return;
-  }
+  //const sectionContainer = formContainer.querySelector(`.form-section[data-id="hours"]`);
+  //if (!sectionContainer) {
+    //console.error(`Section container with id hours not found`);
+    //return;
+  //}
 
-  const operationModelCheckboxes = sectionContainer.querySelectorAll('input[name="operationModel"]');
-  const menuStyleCheckboxes = sectionContainer.querySelectorAll('input[name="menuStyle"]');
+  //const operationModelCheckboxes = sectionContainer.querySelectorAll('input[name="operationModel"]');
+  //const menuStyleCheckboxes = sectionContainer.querySelectorAll('input[name="menuStyle"]');
 
-  if (operationModelCheckboxes.length > 0) {
-    operationModelCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('click', () => selectOnlyThis(checkbox, 'operationModel', showDaySelection));
-    });
-  } else {
-    console.error('Operation model checkboxes not found');
-  }
+  //if (operationModelCheckboxes.length > 0) {
+   // operationModelCheckboxes.forEach((checkbox) => {
+      //checkbox.addEventListener('click', () => selectOnlyThis(checkbox, 'operationModel', showDaySelection));
+    //});
+  //} else {
+    //console.error('Operation model checkboxes not found');
+ // }
 
-  if (menuStyleCheckboxes.length > 0) {
-    menuStyleCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('click', () => selectOnlyThis(checkbox, 'menuStyle', showMenuSelection));
-    });
-  } else {
-    console.error('Menu style checkboxes not found');
-  }
+  //if (menuStyleCheckboxes.length > 0) {
+    //menuStyleCheckboxes.forEach((checkbox) => {
+      //checkbox.addEventListener('click', () => selectOnlyThis(checkbox, 'menuStyle', showMenuSelection));
+    //});
+  //} else {
+    //console.error('Menu style checkboxes not found');
+  //}
 
   // Initialize menu selection handlers
   await initializeMenuSelection(formContainer);

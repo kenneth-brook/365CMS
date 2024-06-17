@@ -4,6 +4,7 @@ const { getDbPool } = require('../db');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
+  console.log('entered submit 2')
   const pool = await getDbPool();
   const client = await pool.connect();
   try {
@@ -26,10 +27,12 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/eat-eat-type', async (req, res) => {
+  console.log('entered submit 3')
   const pool = await getDbPool();
   const client = await pool.connect();
   try {
     const { eatId, typeId } = req.body;
+    console.log(eatId, typeId)
 
     await client.query('INSERT INTO eat_eat_type (eat_id, eat_type_id) VALUES ($1, $2)', [eatId, typeId]);
 

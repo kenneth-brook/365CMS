@@ -61,7 +61,7 @@ class ApiService {
   }
 
   async insertEatType(eatId, eatTypeId) {
-    return this.fetch('eat-eat-type', {
+    return this.fetch('eat-form-submission/eat-eat-type', {
       method: 'POST',
       body: JSON.stringify({ eatId, eatTypeId }),
       headers: {

@@ -212,13 +212,13 @@ if (businessResponse && businessResponse.id) {
       const eatResponse = await this.apiService.submitEatForm(detailsFormData);
       console.log('Eat form data submitted', eatResponse);
 
-      if (eatResponse && eatResponse.eatFormId) {
+      /*if (eatResponse && eatResponse.eatFormId) {
         const eatId = eatResponse.eatFormId;
         const menuTypesArray = JSON.parse(detailsFormData.get('menuTypes'));
         for (const menuType of menuTypesArray) {
           await this.apiService.insertEatType(eatId, menuType.id);
         }
-      }
+      }*/
     } catch (error) {
       console.error('Error submitting eat form:', error);
     }
