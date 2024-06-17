@@ -3,7 +3,6 @@ import { stayForm, initializeStayForm } from './forms/stayForm.js';
 import { playForm, initializePlayForm } from './forms/playForm.js';
 import { shopForm, initializeShopForm } from './forms/shopForm.js';
 import ListBusinesses from './listBusinesses.js'; // Ensure this import is present
-import ApiService from '../../../services/apiService.js'; // Ensure ApiService is imported
 
 const getUniqueFilename = (filename) => {
   const date = new Date().toISOString().replace(/[-:.]/g, '');
@@ -176,26 +175,54 @@ initializeForm(formContainer, type, initializeForm) {
 
       console.log('Submitting initial form data');
       const businessResponse = await this.apiService.createBusiness(initialFormData);
-debugger;
-      if (businessResponse && businessResponse.id) {
-        console.log('Initial form data submitted successfully');
-        const businessId = businessResponse.id;
-        combinedForm.querySelector('#businessId').value = businessId;
+//debugger;
+if (businessResponse && businessResponse.id) {
+  console.log('Initial form data submitted successfully');
+  const businessId = businessResponse.id;
 
-        // Second submission for business-specific data
-        const detailsFormData = new URLSearchParams();
-        detailsFormData.append('businessId', businessId);
+  // Update the form with the returned business ID
+  const businessIdField = document.createElement('input');
+  businessIdField.type = 'hidden';
+  businessIdField.id = 'businessId';
+  businessIdField.name = 'businessId';
+  businessIdField.value = businessId;
+  combinedForm.appendChild(businessIdField);
 
-        if (type === 'eat') {
-          console.log('Preparing eat form data');
-          const menuTypes = formData.getAll('menuType');
-          detailsFormData.append('menuTypes', JSON.stringify(menuTypes.map(id => ({ id }))));
-          detailsFormData.append('averageCost', formData.get('averageCost'));
-          detailsFormData.append('special_days', JSON.stringify(specialDays));
+  // Second submission for business-specific data
+  const detailsFormData = new URLSearchParams();
+  detailsFormData.append('businessId', businessId);
 
-          console.log(`Submitting eat form data: ${detailsFormData}`);
-          const eatResponse = await this.apiService.submitEatForm(detailsFormData);
+  if (type === 'eat') {
+    console.log('Preparing eat form data');
+    const menuTypes = formData.getAll('menuType');
+    detailsFormData.append('menuTypes', JSON.stringify(menuTypes.map(id => ({ id }))));
+    detailsFormData.append('averageCost', formData.get('averageCost'));
+
+    const specialDays = [];
+    document.querySelectorAll('.day-hours-item').forEach((item) => {
+      const day = item.getAttribute('data-day');
+      const hours = item.getAttribute('data-hours');
+      specialDays.push({ day, hours });
+    });
+    detailsFormData.append('special_days', JSON.stringify(specialDays));
+
+    console.log('Details Form Data:', detailsFormData.toString());
+
+    try {
+      const eatResponse = await this.apiService.submitEatForm(detailsFormData);
+      console.log('Eat form data submitted', eatResponse);
+
+      if (eatResponse && eatResponse.eatFormId) {
+        const eatId = eatResponse.eatFormId;
+        const menuTypesArray = JSON.parse(detailsFormData.get('menuTypes'));
+        for (const menuType of menuTypesArray) {
+          await this.apiService.insertEatType(eatId, menuType.id);
         }
+      }
+    } catch (error) {
+      console.error('Error submitting eat form:', error);
+    }
+  }
 
         // Add other type-specific fields as needed
         if (type === 'play') {

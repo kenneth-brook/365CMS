@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     res.status(200).json({ eatFormId: eatId });
   } catch (error) {
     console.error('Error submitting eat form:', error);
-    res.status(500).send('Error submitting eat form');
+    res.status(500).json({ error: 'Error submitting eat form' });
   } finally {
     client.release();
   }

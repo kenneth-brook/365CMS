@@ -440,7 +440,7 @@ export const initializeTinyMCE = (selector) => {
   });
 }
 
-const attachSpecialDayHandlers = (formContainer) => {
+export const attachSpecialDayHandlers = (formContainer) => {
   const specialDays = [];
   formContainer.querySelector('#add-day-button').addEventListener('click', () => {
     const specialDayInput = formContainer.querySelector('#special-day');
@@ -475,7 +475,7 @@ export const initializeEatForm = async (formContainer) => {
   attachLogoUploadHandler(formContainer);
   attachImageUploadHandler(formContainer);
   initializeTinyMCE('#description');
-  const specialDays = attachSpecialDayHandlers(formContainer);
+  attachSpecialDayHandlers(formContainer);
 
   // Initialize hour and menu selection handlers
   const sectionContainer = formContainer.querySelector(`.form-section[data-id="hours"]`);
