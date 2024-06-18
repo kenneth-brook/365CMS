@@ -217,6 +217,44 @@ export const attachCoordinatesHandler = (formContainer) => {
   autofillButton.addEventListener('click', handleAutofill);
 };
 
+const getUniqueFilename = (filename) => {
+  const date = new Date().toISOString().replace(/[-:.]/g, '');
+  console.log(`${date}_${filename}`)
+  return `${date}_${filename}`;
+};
+
+const uploadFilesToDreamHost = async (formData) => {
+  try {
+    console.log('Uploading files to DreamHost');
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value.name}`);
+    }
+
+    const response = await fetch('https://dev.365easyflow.com/easyflow-images/upload.php', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const responseBody = await response.text();
+    console.log('Raw response body:', responseBody);
+
+    const result = JSON.parse(responseBody);
+    console.log('Upload result:', result);
+
+    if (result.length === 0) {
+      console.error('Upload result is empty:', result);
+      throw new Error('Upload to DreamHost failed: empty result');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    throw error;
+  }
+};
+
+
+
 async function handleAutofill() {
   const streetAddress = document.getElementById('streetAddress').value;
   const city = document.getElementById('city').value;
@@ -270,25 +308,13 @@ export const selectOnlyThis = (checkbox, groupName, callback) => {
 /* Social Functions */
 
 export const attachSocialMediaHandler = (formContainer) => {
-  const addButton = formContainer.querySelector(`#add-social-media`);
-  const socialMediaList = formContainer.querySelector(`#social-media-list`);
-
-  if (!addButton || !socialMediaList) {
-    console.error('One or more elements not found for Social Media handlers');
-    return;
-  }
-
+  const addButton = formContainer.querySelector('#add-social-media');
+  const socialMediaList = formContainer.querySelector('#social-media-list');
   const socialMediaPairs = [];
 
   addButton.addEventListener('click', () => {
-    const platformInput = formContainer.querySelector(`#socialPlatform`);
-    const addressInput = formContainer.querySelector(`#socialAddress`);
-
-    if (!platformInput || !addressInput) {
-      console.error('Social media inputs not found');
-      return;
-    }
-
+    const platformInput = formContainer.querySelector('#socialPlatform');
+    const addressInput = formContainer.querySelector('#socialAddress');
     const platform = platformInput.value.trim();
     const address = addressInput.value.trim();
 
@@ -296,6 +322,8 @@ export const attachSocialMediaHandler = (formContainer) => {
       socialMediaPairs.push({ platform, address });
       const listItem = document.createElement('li');
       listItem.textContent = `${platform}: ${address}`;
+      listItem.dataset.platform = platform;
+      listItem.dataset.address = address;
       socialMediaList.appendChild(listItem);
 
       // Clear inputs
@@ -306,7 +334,7 @@ export const attachSocialMediaHandler = (formContainer) => {
 
   // Store the social media pairs in the form container for later retrieval
   formContainer.socialMediaPairs = socialMediaPairs;
-}
+};
 
 /* Logo Upload */
 
@@ -314,7 +342,7 @@ export const attachLogoUploadHandler = (formContainer) => {
   const logoUploadInput = formContainer.querySelector('#logoUpload');
   const logoPreviewContainer = formContainer.querySelector('#logo-preview');
 
-  logoUploadInput.addEventListener('change', () => {
+  logoUploadInput.addEventListener('change', async () => {
     const file = logoUploadInput.files[0];
     if (file) {
       const reader = new FileReader();
@@ -348,15 +376,33 @@ export const attachLogoUploadHandler = (formContainer) => {
         removeButton.className = 'remove-button';
         removeButton.addEventListener('click', () => {
           logoPreviewContainer.innerHTML = ''; // Clear the logo preview
+          formContainer.logoUrl = ''; // Reset the logo URL
         });
 
         logoPreviewContainer.appendChild(img);
         logoPreviewContainer.appendChild(removeButton);
       };
       reader.readAsDataURL(file);
+
+      // Upload file to DreamHost
+      const uniqueFilename = getUniqueFilename(file.name);
+      const logoFormData = new FormData();
+      logoFormData.append('imageFiles[]', file, uniqueFilename); // Use 'imageFiles[]' key to match server-side script
+
+      try {
+        const uploadResult = await uploadFilesToDreamHost(logoFormData);
+        if (uploadResult && uploadResult[0]) {
+          formContainer.logoUrl = `uploads/${uniqueFilename}`;
+          console.log('Logo URL:', formContainer.logoUrl);
+        } else {
+          console.error('Failed to upload logo:', uploadResult);
+        }
+      } catch (error) {
+        console.error('Error during logo upload:', error);
+      }
     }
   });
-}
+};
 
 /* Images Upload */
 
@@ -365,14 +411,12 @@ export const attachImageUploadHandler = (formContainer) => {
   const imageThumbnailsContainer = formContainer.querySelector('#image-thumbnails');
   const imageFileListContainer = formContainer.querySelector('#image-file-list');
 
-  const imageFiles = [];
+  formContainer.imageUrls = []; // Initialize image URLs array
 
-  imageUploadInput.addEventListener('change', () => {
+  imageUploadInput.addEventListener('change', async () => {
     const files = imageUploadInput.files;
 
-    Array.from(files).forEach(file => {
-      imageFiles.push(file);
-
+    for (const file of files) {
       // Create and display thumbnail
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -405,9 +449,9 @@ export const attachImageUploadHandler = (formContainer) => {
         removeButton.textContent = 'Remove';
         removeButton.className = 'remove-button';
         removeButton.addEventListener('click', () => {
-          const index = imageFiles.indexOf(file);
+          const index = formContainer.imageUrls.indexOf(file.name);
           if (index > -1) {
-            imageFiles.splice(index, 1);
+            formContainer.imageUrls.splice(index, 1);
           }
           imageThumbnailsContainer.removeChild(thumbnailContainer);
           imageFileListContainer.removeChild(listItem);
@@ -423,11 +467,26 @@ export const attachImageUploadHandler = (formContainer) => {
         imageFileListContainer.appendChild(listItem);
       };
       reader.readAsDataURL(file);
-    });
-  });
 
-  return imageFiles; 
-}
+      // Upload file to DreamHost
+      const uniqueFilename = getUniqueFilename(file.name);
+      const imageFormData = new FormData();
+      imageFormData.append('imageFiles[]', file, uniqueFilename); // Use 'imageFiles[]' key to match server-side script
+
+      try {
+        const uploadResult = await uploadFilesToDreamHost(imageFormData);
+        if (uploadResult && uploadResult[0]) {
+          formContainer.imageUrls.push(`uploads/${uniqueFilename}`);
+          console.log('Image URLs:', formContainer.imageUrls);
+        } else {
+          console.error('Failed to upload image:', uploadResult);
+        }
+      } catch (error) {
+        console.error('Error during image upload:', error);
+      }
+    }
+  });
+};
 
 /* Description */
 
@@ -437,8 +496,14 @@ export const initializeTinyMCE = (selector) => {
     license_key: 'gpl',
     plugins: 'link code',
     toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code',
+    setup: (editor) => {
+      editor.on('change', () => {
+        editor.save(); // Ensure the content is saved to the textarea
+      });
+    },
   });
-}
+};
+
 
 export const attachSpecialDayHandlers = (formContainer) => {
   const specialDays = [];
@@ -461,10 +526,13 @@ export const attachSpecialDayHandlers = (formContainer) => {
       // Clear input fields
       specialDayInput.value = '';
       alteredHoursInput.value = '';
+    } else {
+      alert('Please fill both fields.');
     }
   });
 
-  return specialDays;
+  // Attach specialDays array to formContainer for later use
+  formContainer.specialDays = specialDays;
 };
 
 /* Initialization Function */
@@ -595,18 +663,17 @@ window.updateTable = function() {
 };
 
 export const initializeMenuSelection = async (formContainer) => {
-  const menuTypeDropdown = formContainer.querySelector(`#menuType`);
-  const averageCostDropdown = formContainer.querySelector(`#averageCost`);
-  const addMenuTypeButton = formContainer.querySelector(`#add-menu-type`);
-  const addNewMenuTypeButton = formContainer.querySelector(`#add-new-menu-type`);
-  const newMenuTypeInput = formContainer.querySelector(`#newMenuType`);
-  const menuTypeList = formContainer.querySelector(`#menu-type-list`);
+  const menuTypeDropdown = formContainer.querySelector('#menuType');
+  const averageCostDropdown = formContainer.querySelector('#averageCost');
+  const addMenuTypeButton = formContainer.querySelector('#add-menu-type');
+  const addNewMenuTypeButton = formContainer.querySelector('#add-new-menu-type');
+  const newMenuTypeInput = formContainer.querySelector('#newMenuType');
+  const menuTypeList = formContainer.querySelector('#menu-type-list');
 
   const menuTypes = [];
 
   const fetchedMenuTypes = await getMenuTypes();
-  console.log('Fetched menu types:', fetchedMenuTypes);
-  if (fetchedMenuTypes && fetchedMenuTypes.forEach) {
+  if (fetchedMenuTypes && Array.isArray(fetchedMenuTypes)) {
     fetchedMenuTypes.forEach(type => {
       const option = document.createElement('option');
       option.value = type.id;
@@ -614,12 +681,11 @@ export const initializeMenuSelection = async (formContainer) => {
       menuTypeDropdown.appendChild(option);
     });
   } else {
-    console.error(`Error fetching menu types:`, fetchedMenuTypes);
+    console.error('Error fetching menu types:', fetchedMenuTypes);
   }
 
   const fetchedAverageCosts = await getAverageCosts();
-  console.log('Fetched average costs:', fetchedAverageCosts);
-  if (fetchedAverageCosts && fetchedAverageCosts.forEach) {
+  if (fetchedAverageCosts && Array.isArray(fetchedAverageCosts)) {
     fetchedAverageCosts.forEach(cost => {
       const option = document.createElement('option');
       option.value = cost.id;
@@ -627,10 +693,9 @@ export const initializeMenuSelection = async (formContainer) => {
       averageCostDropdown.appendChild(option);
     });
   } else {
-    console.error(`Error fetching average costs:`, fetchedAverageCosts);
+    console.error('Error fetching average costs:', fetchedAverageCosts);
   }
 
-  // Add existing menu type selection
   addMenuTypeButton.addEventListener('click', () => {
     const selectedOption = menuTypeDropdown.options[menuTypeDropdown.selectedIndex];
     if (selectedOption) {
@@ -640,13 +705,10 @@ export const initializeMenuSelection = async (formContainer) => {
     }
   });
 
-  // Add new menu type
   addNewMenuTypeButton.addEventListener('click', async () => {
     const newMenuType = newMenuTypeInput.value.trim();
-    console.log(`Adding new menu type: ${newMenuType}`);
     if (newMenuType) {
       const response = await addNewMenuType(newMenuType);
-      console.log('Add new menu type response:', response);
       if (response && response.id) {
         const option = document.createElement('option');
         option.value = response.id;
@@ -659,34 +721,17 @@ export const initializeMenuSelection = async (formContainer) => {
 
         newMenuTypeInput.value = ''; // Clear the input field
       } else {
-        console.error(`Error adding new menu type:`, response);
+        console.error('Error adding new menu type:', response);
       }
     }
   });
 
-  // Attach to form submission to include menu type data
-  const form = formContainer.querySelector(`#combined-form`);
-  console.log('Form found for submission:', form);
-  if (form) {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
+  // Attach menuTypes to formContainer for later use
+  formContainer.menuTypes = menuTypes;
 
-      const menuTypesInput = document.createElement('input');
-      menuTypesInput.type = 'hidden';
-      menuTypesInput.name = `menuTypes-eat`;
-      menuTypesInput.value = JSON.stringify(menuTypes);
-      form.appendChild(menuTypesInput);
-
-      form.submit(); // Submit the form after appending the hidden input
-    });
-  } else {
-    console.error('Form not found in the form container');
-  }
-
-  // Helper function to create list items with a remove button
   function createMenuListItem(name, id) {
     const listItem = document.createElement('li');
-    listItem.textContent = `${name}`;
+    listItem.textContent = name;
     const removeButton = document.createElement('button');
     removeButton.textContent = 'x';
     removeButton.style.color = 'red';
@@ -701,7 +746,7 @@ export const initializeMenuSelection = async (formContainer) => {
     listItem.appendChild(removeButton);
     return listItem;
   }
-}
+};
 
 export const getMenuTypes = async () => {
   const tableName = `eat_type`;
