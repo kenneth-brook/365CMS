@@ -11,6 +11,7 @@ const menuTypesRoutes = require('./routes/menuTypesRoutes');
 const averageCostRoutes = require('./routes/averageCostRoutes');
 const eatFormRoutes = require('./routes/eatFormRoutes');
 const playFormRoutes = require('./routes/playFormRoutes');
+const shopFormRoutes = require('./routes/shopFormRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -45,6 +46,7 @@ app.use('/menu-types', menuTypesRoutes);
 app.use('/average-costs', averageCostRoutes);
 app.use('/eat-form-submission', eatFormRoutes);
 app.use('/play-form-submission', playFormRoutes);
+app.use('/shop-form-submission', shopFormRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
