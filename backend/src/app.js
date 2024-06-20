@@ -10,15 +10,24 @@ const categoryTypeRoutes = require('./routes/categoryTypeRoutes');
 const menuTypesRoutes = require('./routes/menuTypesRoutes');
 const averageCostRoutes = require('./routes/averageCostRoutes');
 const eatFormRoutes = require('./routes/eatFormRoutes');
+const playFormRoutes = require('./routes/playFormRoutes');
 
 const app = express();
 app.use(cookieParser());
+
 const corsOptions = {
-    origin: 'https://dev.365easyflow.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    optionsSuccessStatus: 200
+  origin: (origin, callback) => {
+      console.log(`Origin: ${origin}`);
+      if (origin === 'https://douglas.365easyflow.com' || !origin) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
@@ -35,10 +44,16 @@ app.use('/category-type', categoryTypeRoutes);
 app.use('/menu-types', menuTypesRoutes);
 app.use('/average-costs', averageCostRoutes);
 app.use('/eat-form-submission', eatFormRoutes);
+app.use('/play-form-submission', playFormRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
 
 module.exports = app;

@@ -59,16 +59,6 @@ class ApiService {
     });
     return response;
   }
-
-  async insertEatType(eatId, eatTypeId) {
-    return this.fetch('eat-form-submission/eat-eat-type', {
-      method: 'POST',
-      body: JSON.stringify({ eatId, eatTypeId }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-  }
 }
 
 export default ApiService;
