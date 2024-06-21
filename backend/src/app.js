@@ -13,6 +13,7 @@ const eatFormRoutes = require('./routes/eatFormRoutes');
 const playFormRoutes = require('./routes/playFormRoutes');
 const shopFormRoutes = require('./routes/shopFormRoutes');
 const stayFormRoutes = require('./routes/stayFormRoutes');
+const tableRoutes = require('./routes/tableRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -20,7 +21,11 @@ app.use(cookieParser());
 const corsOptions = {
   origin: (origin, callback) => {
       console.log(`Origin: ${origin}`);
-      if (origin === 'https://douglas.365easyflow.com' || !origin) {
+      if (origin === 'https://douglas.365easyflow.com' || 
+          origin === 'http://10.128.1.185:3000' ||
+          !origin || 
+          /^http:\/\/localhost:\d+$/.test(origin) ||
+          /^http:\/\/10\.128\.1\.\d+:\d+$/.test(origin)) {
           callback(null, true);
       } else {
           callback(new Error('Not allowed by CORS'));
@@ -49,6 +54,7 @@ app.use('/eat-form-submission', eatFormRoutes);
 app.use('/play-form-submission', playFormRoutes);
 app.use('/shop-form-submission', shopFormRoutes);
 app.use('/stay-form-submission', stayFormRoutes);
+app.use('/data', tableRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
