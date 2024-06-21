@@ -9,18 +9,13 @@ router.post('/', async (req, res) => {
   const pool = await getDbPool();
   const client = await pool.connect();
   try {
-    const { businessId, menuTypes, averageCost, special_days } = req.body;
+    const { businessId, menuTypes, averageCost } = req.body;
 
-    // Debugging logs to check the received data
-    console.log('businessId:', businessId);
-    console.log('menuTypes:', menuTypes);
-    console.log('averageCost:', averageCost);
-    console.log('special_days:', special_days);
 
-    // Insert into eat table
+    // Insert into play table
     const eatResult = await client.query(
-      'INSERT INTO eat (business_id, menu_types, cost, special_days) VALUES ($1, $2, $3, $4) RETURNING id',
-      [businessId, JSON.stringify(JSON.parse(menuTypes)), averageCost, JSON.stringify(JSON.parse(special_days))]
+      'INSERT INTO stay (business_id, stay_types, cost) VALUES ($1, $2, $3) RETURNING id',
+      [businessId, JSON.stringify(JSON.parse(menuTypes)), averageCost]
     );
     const eatId = eatResult.rows[0].id;
 
