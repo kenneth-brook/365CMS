@@ -1,7 +1,9 @@
 const express = require('express');
+const multer = require('multer');
 const { getDbPool } = require('../db');
 
 const router = express.Router();
+const upload = multer();
 
 router.post('/', async (req, res) => {
   console.log('Request Body:', req.body);
