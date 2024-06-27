@@ -14,7 +14,8 @@ const playFormRoutes = require('./routes/playFormRoutes');
 const shopFormRoutes = require('./routes/shopFormRoutes');
 const stayFormRoutes = require('./routes/stayFormRoutes');
 const tableRoutes = require('./routes/tableRoutes');
-const eventFormRoutes = require('./routes/eventFormsRoutes'); // Add this line
+const eventFormRoutes = require('./routes/eventFormsRoutes');
+const eventRoute = require('./routes/eventGetRoute');
 
 const app = express();
 app.use(cookieParser());
@@ -57,7 +58,8 @@ app.use('/play-form-submission', playFormRoutes);
 app.use('/shop-form-submission', shopFormRoutes);
 app.use('/stay-form-submission', stayFormRoutes);
 app.use('/data', tableRoutes);
-app.use('/event-form-submission', eventFormRoutes); // Add this line
+app.use('/event-form-submission', eventFormRoutes);
+app.use('/get-events', eventRoute);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {

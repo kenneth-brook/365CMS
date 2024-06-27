@@ -1,15 +1,13 @@
 const express = require('express');
-const multer = require('multer');
+const router = express.Router();
+const { checkJwt } = require('../middlewares/auth');
 const { getDbPool } = require('../db');
 
-const router = express.Router();
-const upload = multer();
+// Middleware to check JWT
+router.use(checkJwt);
 
 router.post('/', async (req, res) => {
-  console.log('Request Body:', req.body);
-
-  const pool = await getDbPool();
-  const client = await pool.connect();
+  let client;
   try {
     const {
       eventName,
@@ -27,37 +25,31 @@ router.post('/', async (req, res) => {
       phone,
       email,
       website,
-      socialMedia,
+      socialMediaPairs,
       logoUrl,
       imageUrls
     } = req.body;
 
-    // Debugging logs to check the received data
-    console.log('eventName:', eventName);
-    console.log('streetAddress:', streetAddress);
-    console.log('city:', city);
-    console.log('state:', state);
-    console.log('zipCode:', zipCode);
-    console.log('latitude:', latitude);
-    console.log('longitude:', longitude);
-    console.log('startDate:', startDate);
-    console.log('endDate:', endDate);
-    console.log('startTime:', startTime);
-    console.log('endTime:', endTime);
-    console.log('description:', description);
-    console.log('phone:', phone);
-    console.log('email:', email);
-    console.log('website:', website);
-    console.log('socialMedia:', socialMedia);
-    console.log('logoUrl:', logoUrl);
-    console.log('imageUrls:', imageUrls);
+    const pool = await getDbPool();
+    client = await pool.connect();
+
+    let socialMediaArray = [];
+    try {
+      socialMediaArray = socialMediaPairs ? JSON.parse(socialMediaPairs) : [];
+    } catch (parseError) {
+      console.error('Error parsing social media JSON:', parseError);
+      return res.status(400).json({ error: 'Invalid JSON format for social media' });
+    }
+
+    const logoUrlValue = logoUrl || null;
+    const imageUrlsArray = imageUrls ? JSON.parse(imageUrls) : [];
 
     // Insert into events table
     const eventResult = await client.query(
       `INSERT INTO events 
         (name, street_address, city, state, zip, lat, long, start_date, end_date, start_time, end_time, description, phone, email, web, social_platforms, logo, images) 
       VALUES 
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) 
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) 
       RETURNING id`,
       [
         eventName,
@@ -68,16 +60,16 @@ router.post('/', async (req, res) => {
         latitude ? parseFloat(latitude) : null,
         longitude ? parseFloat(longitude) : null,
         startDate,
-        endDate,
-        startTime,
-        endTime,
+        endDate ? endDate : null,
+        startTime ? startTime : null,
+        endTime ? endTime : null,
         description,
         phone,
         email,
         website,
-        JSON.stringify(JSON.parse(socialMedia)),
-        logoUrl,
-        imageUrls.length ? JSON.stringify(JSON.parse(imageUrls)) : null
+        JSON.stringify(socialMediaArray),
+        logoUrlValue,
+        imageUrlsArray.length ? imageUrlsArray : null
       ]
     );
     const eventId = eventResult.rows[0].id;
@@ -87,7 +79,9 @@ router.post('/', async (req, res) => {
     console.error('Error submitting event form:', error);
     res.status(500).json({ error: 'Error submitting event form' });
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 });
 
