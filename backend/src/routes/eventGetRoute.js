@@ -19,3 +19,5 @@ router.get('/', async (req, res) => {
     res.status(500).send(`Error fetching types from table events`);
   }
 });
+
+module.exports = router;
