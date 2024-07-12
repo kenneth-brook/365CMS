@@ -16,6 +16,7 @@ const stayFormRoutes = require('./routes/stayFormRoutes');
 const tableRoutes = require('./routes/tableRoutes');
 const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
+const typeNamesRoutes = require('./routes/typeNamesRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -60,6 +61,7 @@ app.use('/stay-form-submission', stayFormRoutes);
 app.use('/data', tableRoutes);
 app.use('/event-form-submission', eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
+app.use('/type-names', typeNamesRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
