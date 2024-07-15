@@ -4,6 +4,7 @@ const cors = require('cors');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
+const trippingAuth = require('./routes/trippingAuth'); // New auth routes
 const role = require('./routes/role');
 const formSubmissionRoutes = require('./routes/formSubmissionRoutes');
 const categoryTypeRoutes = require('./routes/categoryTypeRoutes');
@@ -27,6 +28,7 @@ const corsOptions = {
     if (origin === 'https://douglas.365easyflow.com' || 
         origin === 'http://10.128.1.185:3000' ||
         origin === 'http://ec2-3-94-236-188.compute-1.amazonaws.com' ||
+        origin === 'http://localhost:3000' ||
         !origin || 
         /^http:\/\/localhost:\d+$/.test(origin) ||
         /^http:\/\/10\.128\.1\.\d+:\d+$/.test(origin)) {
@@ -48,6 +50,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/login', authRoutes);
+app.use('/auth', trippingAuth); // New auth routes
 app.use('/setup', setupRoutes);
 app.use('/user-role', role);
 app.use('/form-submission', formSubmissionRoutes);
