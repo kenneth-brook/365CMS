@@ -55,14 +55,19 @@ router.post('/login', async (req, res) => {
                 expiresIn: 86400 // 24 hours
             });
 
+            console.log('Generated token:', token);
+
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: true, // Always true to support SameSite=None
-                sameSite: 'None',
-                maxAge: 86400000 // 24 hours in milliseconds
+                secure: process.env.NODE_ENV === 'production', // Ensure this is true in production (and on HTTPS)
+                sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies, Lax for local development
+                maxAge: 86400000, // 24 hours in milliseconds
+                path: '/', // Ensure this is set correctly
+                // Remove domain for local development
+                // domain: process.env.NODE_ENV === 'production' ? 'yourdomain.com' : 'localhost'
             });
 
-            res.status(200).send('Login successful');
+            res.status(200).send({ message: 'Login successful', token });
         } finally {
             client.release();
         }
