@@ -18,6 +18,7 @@ const tableRoutes = require('./routes/tableRoutes');
 const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
+const itineraryRoutes = require('./routes/itineraryRoutes'); // Import the new routes
 
 const app = express();
 app.use(cookieParser());
@@ -65,6 +66,7 @@ app.use('/data', tableRoutes);
 app.use('/event-form-submission', eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
+app.use('/itinerary', itineraryRoutes); // Register the new routes
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {

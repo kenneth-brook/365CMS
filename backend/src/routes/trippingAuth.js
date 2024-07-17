@@ -59,15 +59,13 @@ router.post('/login', async (req, res) => {
 
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Ensure this is true in production (and on HTTPS)
-                sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies, Lax for local development
-                maxAge: 86400000, // 24 hours in milliseconds
-                path: '/', // Ensure this is set correctly
-                // Remove domain for local development
-                // domain: process.env.NODE_ENV === 'production' ? 'yourdomain.com' : 'localhost'
+                secure: false, // Set to true if serving over HTTPS in production
+                sameSite: 'Lax',
+                maxAge: 86400000,
+                path: '/',
             });
 
-            res.status(200).send({ message: 'Login successful', token });
+            res.status(200).send({ message: 'Login successful', token, userId: user.id });
         } finally {
             client.release();
         }
