@@ -49,4 +49,46 @@ router.get('/user/:userId', async (req, res) => {
     }
 });
 
+router.put('/update/:itineraryId', async (req, res) => {
+    const { itineraryId } = req.params;
+    const { itineraryData, itineraryName } = req.body;
+
+    try {
+        const pool = await getDbPool();
+        const client = await pool.connect();
+        try {
+            let query = 'UPDATE itinerary SET ';
+            const values = [];
+            let valueIndex = 1;
+
+            if (itineraryData) {
+                query += `itinerary_data = $${valueIndex}, `;
+                values.push(itineraryData);
+                valueIndex++;
+            }
+            
+            if (itineraryName) {
+                query += `itinerary_name = $${valueIndex}, `;
+                values.push(itineraryName);
+                valueIndex++;
+            }
+
+            // Remove the trailing comma and space
+            query = query.slice(0, -2);
+
+            query += ` WHERE id = $${valueIndex} RETURNING *`;
+            values.push(itineraryId);
+
+            const result = await client.query(query, values);
+            res.json(result.rows[0]);
+        } finally {
+            client.release();
+        }
+    } catch (error) {
+        console.error('Error updating itinerary:', error);
+        res.status(500).send('Error updating itinerary');
+    }
+});
+
+
 module.exports = router;
