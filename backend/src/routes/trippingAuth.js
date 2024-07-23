@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).send('Email and password must be provided');
+        return res.status(400).json({ error: 'Email and password must be provided' });
     }
 
     try {
@@ -18,13 +18,13 @@ router.post('/register', async (req, res) => {
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
             await client.query('INSERT INTO "user" (email, password) VALUES ($1, $2)', [email, hashedPassword]);
-            res.status(201).send('User registered successfully');
+            res.status(201).json({ message: 'User registered successfully' });
         } finally {
             client.release();
         }
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).send('Registration error');
+        res.status(500).json({ error: 'Registration error' });
     }
 });
 
