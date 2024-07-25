@@ -30,6 +30,7 @@ const corsOptions = {
         origin === 'http://10.128.1.185:3000' ||
         origin === 'http://ec2-3-94-236-188.compute-1.amazonaws.com' ||
         origin === 'http://localhost:3000' ||
+        origin === 'http://douglastripguide.com' ||
         !origin || 
         /^http:\/\/localhost:\d+$/.test(origin) ||
         /^http:\/\/10\.128\.1\.\d+:\d+$/.test(origin)) {
