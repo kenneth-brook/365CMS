@@ -70,7 +70,6 @@ app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
 app.use('/itinerary', itineraryRoutes);
 app.use('/google', googlePlaceRoutes);
-app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);
