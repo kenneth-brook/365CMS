@@ -19,7 +19,7 @@ const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
-const googlePlaceIdRoutes = require('./routes/googlePlaceId');
+const googlePlaceIdRoutes = require('./routes/googlePlaceRoutes');
 
 const app = express();
 app.use(cookieParser());
