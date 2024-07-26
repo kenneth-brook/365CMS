@@ -19,7 +19,7 @@ const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
-const googlePlaceIdRoutes = require('./routes/googlePlaceRoutes');
+const googlePlaceRoutes = require('./routes/googlePlaceRoutes');
 
 const app = express();
 app.use(cookieParser());
@@ -69,7 +69,7 @@ app.use('/event-form-submission', eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
 app.use('/itinerary', itineraryRoutes);
-app.use('/google', googlePlaceIdRoutes);
+app.use('/google', googlePlaceRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
