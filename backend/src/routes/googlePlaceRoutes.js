@@ -5,10 +5,14 @@ const router = express.Router();
 
 const GOOGLE_API_KEY = 'AIzaSyDTbjk-yo62bU2t2IGKCmb0AEgqtm2Pem0'; // Replace with your actual API key
 
+console.log('Received request for Google Reviews, outside call');
+
 router.get('/getGoogleReviews', async (req, res) => {
+  console.log('Received request for Google Reviews, inside call');
   const { lat, lng, name } = req.query;
 
   if (!lat || !lng || !name) {
+    console.log('Missing parameters');
     return res.status(400).send('Latitude, longitude, and name are required');
   }
 
