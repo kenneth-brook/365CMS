@@ -4,7 +4,7 @@ const cors = require('cors');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
-const trippingAuth = require('./routes/trippingAuth'); // New auth routes
+const trippingAuth = require('./routes/trippingAuth');
 const role = require('./routes/role');
 const formSubmissionRoutes = require('./routes/formSubmissionRoutes');
 const categoryTypeRoutes = require('./routes/categoryTypeRoutes');
@@ -18,7 +18,8 @@ const tableRoutes = require('./routes/tableRoutes');
 const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
-const itineraryRoutes = require('./routes/itineraryRoutes'); // Import the new routes
+const itineraryRoutes = require('./routes/itineraryRoutes');
+const googlePlaceIdRoutes = require('./routes/googlePlaceId');
 
 const app = express();
 app.use(cookieParser());
@@ -52,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/login', authRoutes);
-app.use('/auth', trippingAuth); // New auth routes
+app.use('/auth', trippingAuth);
 app.use('/setup', setupRoutes);
 app.use('/user-role', role);
 app.use('/form-submission', formSubmissionRoutes);
@@ -67,7 +68,8 @@ app.use('/data', tableRoutes);
 app.use('/event-form-submission', eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
-app.use('/itinerary', itineraryRoutes); // Register the new routes
+app.use('/itinerary', itineraryRoutes);
+app.use('/google', googlePlaceIdRoutes);
 app.use('/', stateManagementRoutes);
 
 app.get('*', (req, res) => {
