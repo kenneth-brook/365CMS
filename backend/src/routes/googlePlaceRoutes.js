@@ -3,7 +3,8 @@ const axios = require('axios');
 
 const router = express.Router();
 
-const GOOGLE_API_KEY = 'AIzaSyDTbjk-yo62bU2t2IGKCmb0AEgqtm2Pem0';
+//const GOOGLE_API_KEY = 'AIzaSyDTbjk-yo62bU2t2IGKCmb0AEgqtm2Pem0';
+const GOOGLE_API_KEY = 'AIzaSyAGefyRhxQki08cpUEvDe4dTBh0N8YGArc';
 
 console.log('Received request for Google Reviews, outside call');
 
