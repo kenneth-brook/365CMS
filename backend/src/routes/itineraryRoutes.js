@@ -14,10 +14,10 @@ router.post('/save', async (req, res) => {
         const client = await pool.connect();
         try {
             const result = await client.query(
-                'INSERT INTO itinerary (user_id, itinerary_name, itinerary_data) VALUES ($1, $2, $3) RETURNING id',
+                'INSERT INTO itinerary (user_id, itinerary_name, itinerary_data) VALUES ($1, $2, $3) RETURNING *',
                 [userId, itineraryName, itineraryData]
             );
-            res.status(201).json({ message: 'Itinerary saved successfully', itineraryId: result.rows[0].id });
+            res.status(201).json(result.rows[0]);
         } finally {
             client.release();
         }
@@ -61,16 +61,20 @@ router.put('/update/:itineraryId', async (req, res) => {
             const values = [];
             let valueIndex = 1;
 
-            if (itineraryData) {
+            if (itineraryData !== undefined) {
                 query += `itinerary_data = $${valueIndex}, `;
                 values.push(itineraryData);
                 valueIndex++;
             }
             
-            if (itineraryName) {
+            if (itineraryName !== undefined) {
                 query += `itinerary_name = $${valueIndex}, `;
                 values.push(itineraryName);
                 valueIndex++;
+            }
+
+            if (values.length === 0) {
+                return res.status(400).json({ error: 'No fields to update' });
             }
 
             // Remove the trailing comma and space
@@ -80,6 +84,10 @@ router.put('/update/:itineraryId', async (req, res) => {
             values.push(itineraryId);
 
             const result = await client.query(query, values);
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Itinerary not found' });
+            }
+            
             res.json(result.rows[0]);
         } finally {
             client.release();
@@ -87,6 +95,35 @@ router.put('/update/:itineraryId', async (req, res) => {
     } catch (error) {
         console.error('Error updating itinerary:', error);
         res.status(500).send('Error updating itinerary');
+    }
+});
+
+
+// Route to delete an itinerary
+router.delete('/delete/:itineraryId', async (req, res) => {
+    const { itineraryId } = req.params;
+
+    if (!itineraryId) {
+        return res.status(400).send('Itinerary ID must be provided');
+    }
+
+    try {
+        const pool = await getDbPool();
+        const client = await pool.connect();
+        try {
+            const result = await client.query('DELETE FROM itinerary WHERE id = $1 RETURNING *', [itineraryId]);
+            
+            if (result.rowCount === 0) {
+                return res.status(404).send('Itinerary not found');
+            }
+
+            res.status(200).json({ message: 'Itinerary deleted successfully', deletedItinerary: result.rows[0] });
+        } finally {
+            client.release();
+        }
+    } catch (error) {
+        console.error('Error deleting itinerary:', error);
+        res.status(500).send('Error deleting itinerary');
     }
 });
 
