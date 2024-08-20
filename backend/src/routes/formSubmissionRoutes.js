@@ -84,35 +84,6 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  console.log('Request Body:', req.body);
-
-  const pool = await getDbPool();
-  const client = await pool.connect();
-  try {
-      const { businessId, menuTypes, averageCost, special_days } = req.body;
-
-      // Debugging logs to check the received data
-      console.log('businessId:', businessId);
-      console.log('menuTypes:', menuTypes);
-      console.log('averageCost:', averageCost);
-      console.log('special_days:', special_days);
-
-      // Update eat data
-      await client.query(
-          'UPDATE eat SET menu_types = $1, cost = $2, special_days = $3 WHERE business_id = $4',
-          [JSON.stringify(JSON.parse(menuTypes)), averageCost, JSON.stringify(JSON.parse(special_days)), businessId]
-      );
-
-      res.status(200).json({ message: 'Eat form updated successfully' });
-  } catch (error) {
-      console.error('Error updating eat form:', error);
-      res.status(500).json({ error: 'Error updating eat form' });
-  } finally {
-      client.release();
-  }
-});
-
-router.put('/:id', async (req, res) => {
   try {
       const {
           businessName,
