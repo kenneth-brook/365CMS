@@ -107,11 +107,6 @@ router.put('/:id', async (req, res) => {
 
       const businessId = req.params.id;
 
-      // Validate form data
-      if (!businessName || !streetAddress || !city || !state || !zipCode) {
-          return res.status(400).json({ error: 'Required fields are missing' });
-      }
-
       // Parse social media data if present
       let socialMediaArray = [];
       try {
