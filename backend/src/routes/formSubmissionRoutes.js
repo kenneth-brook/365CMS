@@ -116,20 +116,21 @@ router.put('/:id', async (req, res) => {
           return res.status(400).json({ error: 'Invalid JSON format for social media' });
       }
 
-      // Parse chamber member boolean
-      const isChamberMember = chamberMember === 'true';
+      // Parse imageUrls data if present
+      let imageUrlsArray = [];
+      try {
+          imageUrlsArray = imageUrls ? JSON.parse(imageUrls) : [];
+      } catch (parseError) {
+          console.error('Error parsing imageUrls JSON:', parseError);
+          return res.status(400).json({ error: 'Invalid JSON format for imageUrls' });
+      }
 
-      // Parse active status boolean
+      // Parse chamber member and active status as booleans
+      const isChamberMember = chamberMember === 'true';
       const isActive = active === 'true';
 
-      // Handle empty fields for arrays
-      const logoUrlValue = logoUrl || null;
-      const imageUrlsArray = imageUrls ? JSON.parse(imageUrls) : [];
-
-      // Get database connection pool
       const pool = await getDbPool();
 
-      // Start a transaction
       const client = await pool.connect();
       try {
           await client.query('BEGIN');
@@ -137,7 +138,26 @@ router.put('/:id', async (req, res) => {
           // Update business data
           await client.query(
               `UPDATE businesses SET active = $1, name = $2, street_address = $3, mailing_address = $4, city = $5, state = $6, zip = $7, lat = $8, long = $9, phone = $10, email = $11, web = $12, social_platforms = $13, images = $14, description = $15, chamber_member = $16, logo = $17 WHERE id = $18`,
-              [isActive, businessName, streetAddress, mailingAddress, city, state, zipCode, latitude ? parseFloat(latitude) : null, longitude ? parseFloat(longitude) : null, phone, email, website, JSON.stringify(socialMediaArray), imageUrlsArray.length ? imageUrlsArray : null, description, isChamberMember, logoUrlValue, businessId]
+              [
+                  isActive,
+                  businessName,
+                  streetAddress,
+                  mailingAddress,
+                  city,
+                  state,
+                  zipCode,
+                  latitude ? parseFloat(latitude) : null,
+                  longitude ? parseFloat(longitude) : null,
+                  phone,
+                  email,
+                  website,
+                  JSON.stringify(socialMediaArray),
+                  imageUrlsArray.length ? JSON.stringify(imageUrlsArray) : null, // Only stringify if not empty
+                  description,
+                  isChamberMember,
+                  logoUrl || null,
+                  businessId
+              ]
           );
 
           await client.query('COMMIT');
