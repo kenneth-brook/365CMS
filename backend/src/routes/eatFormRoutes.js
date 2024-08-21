@@ -39,9 +39,15 @@ router.put('/:id', async (req, res) => {
   try {
       const { businessId, menuTypes, averageCost, special_days } = req.body;
 
+      // Debugging logs
+      console.log('Received menuTypes:', menuTypes);
+
       // No need to parse if already an object
       const parsedMenuTypes = typeof menuTypes === 'string' ? JSON.parse(menuTypes) : menuTypes;
       const parsedSpecialDays = typeof special_days === 'string' ? JSON.parse(special_days) : special_days;
+
+      // Additional debugging logs
+      console.log('Parsed menuTypes:', parsedMenuTypes);
 
       // Update eat data
       await client.query(
