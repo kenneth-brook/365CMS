@@ -11,16 +11,14 @@ router.post('/', async (req, res) => {
   try {
     const { businessId, menuTypes, averageCost, special_days } = req.body;
 
-    // Debugging logs to check the received data
-    console.log('businessId:', businessId);
-    console.log('menuTypes:', menuTypes);
-    console.log('averageCost:', averageCost);
-    console.log('special_days:', special_days);
+    // No need to parse if already an object
+    const parsedMenuTypes = typeof menuTypes === 'string' ? JSON.parse(menuTypes) : menuTypes;
+    const parsedSpecialDays = typeof special_days === 'string' ? JSON.parse(special_days) : special_days;
 
     // Insert into eat table
     const eatResult = await client.query(
       'INSERT INTO eat (business_id, menu_types, cost, special_days) VALUES ($1, $2, $3, $4) RETURNING id',
-      [businessId, JSON.stringify(JSON.parse(menuTypes)), averageCost, JSON.stringify(JSON.parse(special_days))]
+      [businessId, JSON.stringify(parsedMenuTypes), averageCost, JSON.stringify(parsedSpecialDays)]
     );
     const eatId = eatResult.rows[0].id;
 
@@ -41,16 +39,14 @@ router.put('/:id', async (req, res) => {
   try {
       const { businessId, menuTypes, averageCost, special_days } = req.body;
 
-      // Debugging logs to check the received data
-      console.log('businessId:', businessId);
-      console.log('menuTypes:', menuTypes);
-      console.log('averageCost:', averageCost);
-      console.log('special_days:', special_days);
+      // No need to parse if already an object
+      const parsedMenuTypes = typeof menuTypes === 'string' ? JSON.parse(menuTypes) : menuTypes;
+      const parsedSpecialDays = typeof special_days === 'string' ? JSON.parse(special_days) : special_days;
 
       // Update eat data
       await client.query(
           'UPDATE eat SET menu_types = $1, cost = $2, special_days = $3 WHERE business_id = $4',
-          [JSON.stringify(JSON.parse(menuTypes)), averageCost, JSON.stringify(JSON.parse(special_days)), businessId]
+          [JSON.stringify(parsedMenuTypes), averageCost, JSON.stringify(parsedSpecialDays), businessId]
       );
 
       res.status(200).json({ message: 'Eat form updated successfully' });
