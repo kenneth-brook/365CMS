@@ -32,30 +32,25 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  console.log('Request Body:', req.body);
-
+  const { businessId, menuTypes, averageCost, special_days } = req.body;
   const pool = await getDbPool();
   const client = await pool.connect();
+
   try {
-      const { businessId, menuTypes, averageCost, special_days } = req.body;
-
-      // Debugging logs
-      console.log('Received menuTypes:', menuTypes);
-
-      // No need to parse if already an object
+      // Ensure that menuTypes and special_days are parsed correctly
       const parsedMenuTypes = typeof menuTypes === 'string' ? JSON.parse(menuTypes) : menuTypes;
       const parsedSpecialDays = typeof special_days === 'string' ? JSON.parse(special_days) : special_days;
 
-      // Additional debugging logs
-      console.log('Parsed menuTypes:', parsedMenuTypes);
-
-      // Update eat data
-      await client.query(
-          'UPDATE eat SET menu_types = $1, cost = $2, special_days = $3 WHERE business_id = $4',
-          [JSON.stringify(parsedMenuTypes), averageCost, JSON.stringify(parsedSpecialDays), businessId]
-      );
-
-      res.status(200).json({ message: 'Eat form updated successfully' });
+      // Check if businessId is provided to update the existing entry
+      if (businessId) {
+          const result = await client.query(
+              'UPDATE eat SET menu_types = $1, cost = $2, special_days = $3 WHERE business_id = $4',
+              [JSON.stringify(parsedMenuTypes), averageCost, JSON.stringify(parsedSpecialDays), businessId]
+          );
+          res.status(200).json({ message: 'Eat form updated successfully' });
+      } else {
+          res.status(400).json({ error: 'businessId is missing' });
+      }
   } catch (error) {
       console.error('Error updating eat form:', error);
       res.status(500).json({ error: 'Error updating eat form' });
