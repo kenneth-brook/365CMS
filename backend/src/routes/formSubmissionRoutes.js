@@ -118,11 +118,15 @@ router.put('/:id', async (req, res) => {
 
       // Parse imageUrls data if present
       let imageUrlsArray = [];
-      try {
-          imageUrlsArray = imageUrls ? JSON.parse(imageUrls) : [];
-      } catch (parseError) {
-          console.error('Error parsing imageUrls JSON:', parseError);
-          return res.status(400).json({ error: 'Invalid JSON format for imageUrls' });
+      if (Array.isArray(imageUrls)) {
+          imageUrlsArray = imageUrls; // Directly use the array if it's already an array
+      } else if (typeof imageUrls === 'string') {
+          try {
+              imageUrlsArray = JSON.parse(imageUrls); // Parse if it's a string
+          } catch (parseError) {
+              console.error('Error parsing imageUrls JSON:', parseError);
+              return res.status(400).json({ error: 'Invalid JSON format for imageUrls' });
+          }
       }
 
       // Parse chamber member and active status as booleans
@@ -152,7 +156,7 @@ router.put('/:id', async (req, res) => {
                   email,
                   website,
                   JSON.stringify(socialMediaArray),
-                  imageUrlsArray.length ? JSON.stringify(imageUrlsArray) : null, // Only stringify if not empty
+                  imageUrlsArray.length ? imageUrlsArray : null,
                   description,
                   isChamberMember,
                   logoUrl || null,
@@ -174,5 +178,6 @@ router.put('/:id', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 module.exports = router;
