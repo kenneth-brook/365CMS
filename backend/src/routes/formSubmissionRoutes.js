@@ -29,6 +29,8 @@ router.post('/', async (req, res) => {
       imageUrls
     } = req.body;
 
+    console.log('Received payload:', req.body);
+
     // Validate form data
     if (!businessName || !streetAddress || !city || !state || !zipCode) {
       return res.status(400).json({ error: 'Required fields are missing' });
@@ -181,36 +183,29 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const businessId = req.params.id;
+      const businessId = req.params.id;
 
-    const pool = await getDbPool();
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
+      const pool = await getDbPool();
+      const client = await pool.connect();
 
-      // Delete business data
-      const deleteResult = await client.query(
-        'DELETE FROM businesses WHERE id = $1 RETURNING id',
-        [businessId]
-      );
+      try {
+          await client.query('BEGIN');
 
-      await client.query('COMMIT');
+          // Perform the delete operation
+          await client.query('DELETE FROM businesses WHERE id = $1', [businessId]);
 
-      if (deleteResult.rowCount === 0) {
-        return res.status(404).json({ error: 'Business not found' });
+          await client.query('COMMIT');
+          res.status(200).json({ message: 'Business deleted successfully' });
+      } catch (error) {
+          await client.query('ROLLBACK');
+          console.error('Error during transaction:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      } finally {
+          client.release();
       }
-
-      res.status(200).json({ message: 'Business deleted successfully', id: deleteResult.rows[0].id });
-    } catch (error) {
-      await client.query('ROLLBACK');
-      console.error('Error during transaction:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } finally {
-      client.release();
-    }
   } catch (error) {
-    console.error('Error processing delete request:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error deleting business:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
