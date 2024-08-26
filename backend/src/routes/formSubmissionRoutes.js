@@ -179,5 +179,39 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const businessId = req.params.id;
+
+    const pool = await getDbPool();
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Delete business data
+      const deleteResult = await client.query(
+        'DELETE FROM businesses WHERE id = $1 RETURNING id',
+        [businessId]
+      );
+
+      await client.query('COMMIT');
+
+      if (deleteResult.rowCount === 0) {
+        return res.status(404).json({ error: 'Business not found' });
+      }
+
+      res.status(200).json({ message: 'Business deleted successfully', id: deleteResult.rows[0].id });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error during transaction:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Error processing delete request:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 module.exports = router;
