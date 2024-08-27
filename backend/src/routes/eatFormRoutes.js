@@ -9,11 +9,11 @@ router.post('/', async (req, res) => {
   const pool = await getDbPool();
   const client = await pool.connect();
   try {
-    const { businessId, menuTypes, averageCost, special_days } = req.body;
+    const { businessId, menuTypes, averageCost, specialDays } = req.body;
 
-    // No need to parse if already an object
+    // Parse the stringified JSON arrays if they are sent as strings
     const parsedMenuTypes = typeof menuTypes === 'string' ? JSON.parse(menuTypes) : menuTypes;
-    const parsedSpecialDays = typeof special_days === 'string' ? JSON.parse(special_days) : special_days;
+    const parsedSpecialDays = typeof specialDays === 'string' ? JSON.parse(specialDays) : specialDays;
 
     // Insert into eat table
     const eatResult = await client.query(
