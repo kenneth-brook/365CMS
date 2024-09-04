@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const multer = require('multer');
 const setupRoutes = require('./routes/setupRoutes');
 const stateManagementRoutes = require('./routes/stateManagementRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -65,7 +66,7 @@ app.use('/play-form-submission', playFormRoutes);
 app.use('/shop-form-submission', shopFormRoutes);
 app.use('/stay-form-submission', stayFormRoutes);
 app.use('/data', tableRoutes);
-app.use('/event-form-submission', eventFormRoutes);
+app.use('/event-form-submission', multer().none(), eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
 app.use('/itinerary', itineraryRoutes);
