@@ -18,6 +18,7 @@ const stayFormRoutes = require('./routes/stayFormRoutes');
 const tableRoutes = require('./routes/tableRoutes');
 const eventFormRoutes = require('./routes/eventFormsRoutes');
 const eventGetRoutes = require('./routes/eventGetRoute');
+const usersRoutes = require('./routes/usersRoutes');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
 const googlePlaceRoutes = require('./routes/googlePlaceRoutes');
@@ -70,6 +71,7 @@ app.use('/event-form-submission', multer().none(), eventFormRoutes);
 app.use('/get-events', eventGetRoutes);
 app.use('/type-names', typeNamesRoutes);
 app.use('/itinerary', itineraryRoutes);
+app.use('/users', usersRoutes);
 app.use('/google', googlePlaceRoutes);
 
 app.get('*', (req, res) => {
