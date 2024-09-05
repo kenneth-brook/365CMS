@@ -90,5 +90,28 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  let client;
+  try {
+      const { id } = req.params; // Get event ID from URL parameters
+
+      const pool = await getDbPool();
+      client = await pool.connect();
+
+      // Delete the event from the database
+      const result = await client.query('DELETE FROM events WHERE id = $1', [id]);
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: 'Event not found' });
+      }
+
+      res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting event:', error);
+      res.status(500).json({ error: 'Error deleting event' });
+  } finally {
+      if (client) client.release();
+  }
+});
 
 module.exports = router;
