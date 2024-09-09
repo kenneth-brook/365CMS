@@ -7,7 +7,6 @@ const router = express.Router();
 
 // POST endpoint for login
 router.post('/', async (req, res) => {
-    console.log('Attempting to log in with body:', req.body);
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).send('Email and password must be provided');
@@ -40,7 +39,7 @@ router.post('/', async (req, res) => {
                 maxAge: 86400000 // 24 hours in milliseconds
             });
 
-            res.status(200).send('Login successful');
+            return res.status(200).json({ temppass: user.temppass });
         } finally {
             client.release();
         }
