@@ -23,6 +23,7 @@ const addUserRoutes = require('./routes/addUserRoutes');
 const typeNamesRoutes = require('./routes/typeNamesRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
 const googlePlaceRoutes = require('./routes/googlePlaceRoutes');
+const memberPull = require('./routes/memberPull');
 
 const app = express();
 app.use(cookieParser());
@@ -35,6 +36,7 @@ const corsOptions = {
         origin === 'http://ec2-3-94-236-188.compute-1.amazonaws.com' ||
         origin === 'http://localhost:3000' ||
         origin === 'https://douglastripguide.com' ||
+        origin === 'https://review.365dtm.com' ||
         !origin || 
         /^http:\/\/localhost:\d+$/.test(origin) ||
         /^http:\/\/10\.128\.1\.\d+:\d+$/.test(origin)) {
@@ -75,6 +77,7 @@ app.use('/itinerary', itineraryRoutes);
 app.use('/users', usersRoutes);
 app.use('/add-user', addUserRoutes);
 app.use('/google', googlePlaceRoutes);
+app.use('/members', memberPull);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);
