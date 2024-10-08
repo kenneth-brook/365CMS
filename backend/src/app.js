@@ -36,7 +36,7 @@ const corsOptions = {
         origin === 'http://ec2-3-94-236-188.compute-1.amazonaws.com' ||
         origin === 'http://localhost:3000' ||
         origin === 'https://douglastripguide.com' ||
-        origin === 'https://review.365dtm.com' ||
+        origin === 'https://visitdouglasga.org' ||
         !origin || 
         /^http:\/\/localhost:\d+$/.test(origin) ||
         /^http:\/\/10\.128\.1\.\d+:\d+$/.test(origin)) {
