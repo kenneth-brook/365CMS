@@ -24,6 +24,7 @@ const typeNamesRoutes = require('./routes/typeNamesRoutes');
 const itineraryRoutes = require('./routes/itineraryRoutes');
 const googlePlaceRoutes = require('./routes/googlePlaceRoutes');
 const memberPull = require('./routes/memberPull');
+const thirdPartyEventsRoute = require('./routes/thirdPartyEventsRoute');
 
 const app = express();
 app.use(cookieParser());
@@ -54,6 +55,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
+app.use('/type-names', (req, res, next) => {
+  console.log(`Request method: ${req.method}, Path: ${req.path}`);
+  next();
+});
+app.options('/type-names/*', cors(corsOptions));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -78,6 +85,7 @@ app.use('/users', usersRoutes);
 app.use('/add-user', addUserRoutes);
 app.use('/google', googlePlaceRoutes);
 app.use('/members', memberPull);
+app.use('/', thirdPartyEventsRoute);
 
 app.get('*', (req, res) => {
     res.status(200).send(`You hit path: ${req.path}`);
